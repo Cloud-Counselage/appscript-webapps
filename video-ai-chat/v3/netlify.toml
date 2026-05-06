@@ -1,0 +1,7 @@
+[build]
+  command = "npm install && npm run build"
+  publish = "dist"
+
+[build.environment]
+  VITE_HUGGINGFACE_TOKEN = ""
+  NODE_VERSION = "18.16.0"
