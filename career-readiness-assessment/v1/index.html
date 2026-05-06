@@ -1,0 +1,431 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+  <base target="_top"> 
+  <title>Career Readiness Assessment</title> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <style> 
+   :root {
+    --border-color: #5a6271;
+   }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 15px; background-color: #f4f6f8; color: #333; line-height: 1.6; } 
+    .container { max-width: 850px; margin: 20px auto; background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); } 
+    h1 { color: #2c3e50; text-align: center; margin-bottom: 0px; margin-top: -10Px} 
+    h2 { color: #34495e; border-bottom: 2px solid #3498db; padding-bottom: 5px; margin-top: 35px; } 
+
+    /* ---- styles for logo ---- */
+    .header {position: relative; width: 100%; }
+    .top-row {display: flex; justify-content: space-between; align-items: flex-start; }
+    .center-row { margin-top: 0px; text-align: center;}
+    .logo-right {height: 50px; }
+    .logo-right {height: 70px; }
+    .logo-center {height: 50px; }
+
+
+    /* --- NEW STYLES FOR INTRO BOX --- */ 
+    .intro-box { background-color: #f8f9fa; border: 1px solid #dee2e6; border-left: 5px solid #3498db; padding: 20px; margin-bottom: 25px; border-radius: 5px; } 
+    .intro-box h3 { margin-top: 0; font-size: 1.2em; color: #2c3e50; } 
+    .intro-box h4 { margin-top: 15px; margin-bottom: 8px; color: #34495e; font-size: 1.05em; } 
+    .intro-box p { margin-bottom: 10px; font-size: 0.95em; } 
+    .intro-box ul { list-style-position: inside; padding-left: 5px; margin-top: 0; } 
+    .intro-box ul li { 
+      margin-bottom: 5px; 
+      font-size: 0.95em; 
+    } 
+    /* --- END NEW STYLES --- */ 
+    .question-item { margin-bottom: 22px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #fafafa; transition: border 0.3s; } 
+    .question-text { font-weight: bold; margin-bottom: 10px; display: block; color: #333; } 
+    .options-group label { display: block; margin-bottom: 8px; font-weight: normal; cursor: pointer; padding: 5px 8px; border-radius: 4px; transition: background-color 0.2s;} 
+    .options-group label:hover { background-color: #e9ecef; } 
+    .options-group input[type="radio"], .options-group input[type="checkbox"] { margin-right: 10px; transform: scale(1.1); vertical-align: middle;} 
+    textarea { width: calc(100% - 22px); padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; font-size: 1em; } 
+    .input-group { margin-bottom: 20px; } 
+    .input-group label { display: block; font-weight: bold; margin-bottom: 5px; } 
+    .input-group input[type="text"], .input-group input[type="email"] { width: calc(100% - 22px); padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; } 
+    button[type="submit"] { background-color: #3498db; color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-size: 1.1em; display: block; margin: 30px auto 0 auto; transition: background-color 0.3s ease; } 
+    button[type="submit"]:hover { background-color: #2980b9; } 
+    button[type="submit"]:disabled { background-color: #bdc3c7; cursor: not-allowed; } 
+    #results { margin-top: 30px; padding: 20px; border: 2px solid #3498db; border-radius: 8px; background-color: #ecf8ff; } 
+    #results h2.summary-title { color: #2c3e50; margin-top: 0; border-bottom: none; text-align: center; margin-bottom: 20px;} 
+    .feedback-message { white-space: pre-wrap; background-color: #fff; padding: 15px; border-radius: 4px; border: 1px solid #ddd; font-size: 1.1em; text-align: center; } 
+    .feedback-message a { color: #2980b9; font-weight: bold; } 
+    .hidden { display: none; } 
+    .loader { border: 6px solid #f3f3f3; border-top: 6px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 20px auto; } 
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } 
+    .error-message { color: #c0392b; font-size: 0.9em; margin-top: 5px; text-align:center; font-weight: bold; } 
+  </style> 
+</head> 
+<body> 
+  <div class="container"> 
+    <div class="header">
+        <div class="top-row">
+            <img class="logo-left"
+                src="https://drive.google.com/thumbnail?id=1Y8XsMTlhUIRytbtXGWJnidO9EbyyiHF4&sz=w110"
+                alt="Left Logo">
+
+            <img class="logo-right"
+                src="https://drive.google.com/thumbnail?id=1P7zwTpkuRCGEyVHXnJVgkJG68ZTsb_Xv&sz=w130"
+                alt="Right Logo">
+        </div>
+
+        <div class="center-row">
+            <img class="logo-center"
+                src="https://drive.google.com/thumbnail?id=1BziX8hratrGSp0s8KWG-btwcd2Rpq2vO&sz=w110"
+                alt="Center Logo">
+        </div>
+    </div>
+
+
+    <form id="careerQuizForm"> 
+        <h1>Career Readiness Assessment</h1> 
+        <!-- NEW INTRO BLOCK --> 
+        <div class="intro-box"> 
+            <h3>📝 Instructions: Career Readiness Assessment</h3>             
+            <h4>🎯 Purpose of the Assessment</h4> 
+            <p>This assessment is designed to help you understand your current level of preparedness for a successful career. It evaluates key competencies including Self-Development, Communication, Professionalism, and Critical Thinking.</p> 
+            <p>This is a self-discovery tool, not a test. The results will provide a snapshot of your strengths and highlight areas where you can focus your development efforts.</p> 
+            <h4>✅ Before You Begin:</h4> 
+            <ul> 
+              <li>Find a quiet, distraction-free space to focus.</li> 
+              <li>Set aside about 10-15 minutes to complete the assessment in one sitting.</li> 
+              <li>Answer honestly and objectively for the most accurate and beneficial results.</li> 
+            </ul> 
+
+           
+
+            <h4>💡 Tips to Answer Effectively:</h4> 
+            <ul> 
+              <li>There are no right or wrong answers. Your honest self-reflection is what counts.</li> 
+              <li>Answer based on your consistent behaviors and skills, not just recent events or future aspirations.</li> 
+              <li>Go with your first instinct. Overthinking can lead to less authentic answers.</li> 
+              <li>Remember that career readiness changes with experience. This is your status *today*.</li> 
+            </ul> 
+           
+            <h4>🧭 After You Complete:</h4> 
+            <ul> 
+              <li>You will receive a final score (out of 100) reflecting your current career readiness.</li> 
+              <li>You'll get personalized feedback based on your score.</li> 
+              <li>Use these insights to create a targeted plan for your professional growth.</li> 
+            </ul> 
+
+            <h4>🚀 Reminder:</h4> 
+            <p>This assessment is your first step toward taking control of your career path. Use what you learn to take proactive steps towards achieving your professional goals!</p> 
+
+        </div> 
+        <!-- END INTRO BLOCK --> 
+
+        <div class="input-group"> 
+            <label for="userName">Your Full Name:</label> 
+            <input type="text" id="userName" name="userName" required> 
+        </div> 
+        <div class="input-group"> 
+            <label for="userEmail">Your Registered Email ID with IAC:</label> 
+            <input type="email" id="userEmail" name="userEmail" required> 
+        </div> 
+
+        <div id="questionsContainer"></div> 
+        <button type="submit" id="submitButton">Submit & See Results</button> 
+        <div id="loader" class="loader hidden"></div> 
+        <div id="validationError" class="error-message hidden">Please answer all required questions before submitting.</div> 
+    </form> 
+
+ 
+
+    <div id="results" class="hidden"> 
+      <h2 class="summary-title">Assessment Results</h2> 
+      <p><strong>Name:</strong> <span id="resultName"></span></p> 
+      <p><strong>Your Final Score:</strong> <span id="finalScoreDisplay"></span> / 100</p> 
+       
+      <p><strong>Feedback:</strong></p> 
+      <div class="feedback-message" id="resultFeedback"></div> 
+      <p id="saveStatus" style="font-style: italic; margin-top:15px; text-align: center;"></p> 
+    </div> 
+  </div> 
+
+<script> 
+// MODIFIED: Removed 'Header' and 'Paragraph' types from quizData. The intro is now hardcoded in HTML. 
+const quizData = [ 
+    { 
+        type: 'Section', title: 'Section A: Career & Self-Development', 
+        questions: [ 
+            { id: 'a1', text: 'I have performed a personal SWOT Analysis and aware of my strengths, weaknesses, external opportunities and threats in my domain/industry', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'a2', text: 'I have established clear career goals/ objective/ plan', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'a3', text: 'My career goals/ objective/ plan is', type: 'Subjective' }, 
+            { id: 'a4', text: 'Are you able to demonstrate and articulate your skills to the employers', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'a5', text: 'I would rather', type: 'Select', options: ['A. Do the task allocated to me', 'B. Look for opportunities where I can learn new things'], correctAnswer: 'B' }, 
+            { id: 'a6', text: 'I focus on continual growth', type: 'Multiple', options: ['A. Keep Learning new things', 'B. Enrolled in online courses', 'C. Doing a Pet Project', 'D. Doing an Internship', 'E. Part of Student body like ACM, Rotract, CSI, College club, etc', 'F. Take Feedback from my network', 'G. Subscribe to newsletters from Gartner, Forbes, etc.'], correctAnswer: ['A', 'B', 'C', 'D', 'E', 'F', 'G'] }, 
+            { id: 'a7', text: 'I am in touch with my college alumni for Industry Opportunities', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'a8', text: 'I am active on LinkedIn', type: 'Multiple', options: ["A. Don't have an account", 'B. Have an account but not very active', 'C. Just use it to follow industry news, companies, industry leaders', 'D. Engage through sharing of posts, reacting to others posts, attending events, etc.'], correctAnswer: ['C', 'D'] } 
+        ] 
+    }, 
+    { 
+        type: 'Section', title: 'Section B: Communication Skills', 
+        questions: [ 
+            { id: 'b1', text: 'I am able to demonstrate verbal, written, and non-verbal/ body language, abilities', type: 'Multiple', options: ['A. Would like to improve significantly', 'B. Working on improving', 'C. Confident enough to present my skills and abilities', 'D. Communicate in a clear and organized manner so that others can effectively understand', 'E. Can network effectively'], correctAnswer: ['B', 'C', 'D', 'E'] }, 
+            { id: 'b2', text: 'I can employ active listening skills', type: 'Multiple', options: ['A. Completely ignore what has been said', 'B. Use body language and eye contact to show that we are listening but the reality is I am not', 'C. Listen to the parts that interest us and switch off for the parts that don’t', 'D. Pay attention and really take on board what has been said', 'E. Concentrate and listen to understand the intent behind the message'], correctAnswer: ['D', 'E'] }, 
+            { id: 'b3', text: 'I can employ persuasion skills', type: 'Multiple', options: ['A. Smile and Make Eye Contact', 'B. Ask Open-Ended Questions', 'C. Practice Active Listening', 'D. Build Emotional Connection', 'E. Practice Storytelling', 'F. Invoke Social Proof'], correctAnswer: ['A', 'B', 'C', 'D', 'E', 'F'] }, 
+            { id: 'b4', text: 'I can employ influencing skills', type: 'Multiple', options: ['A. Use authority, power, and compliance to get what you want', "B. Building trust, rapport, and cooperation to achieve a desired outcome", "C. Empathize and leverage emotions to impact people's decisions and actions"], correctAnswer: ['B', 'C'] }, 
+            { id: 'b5', text: 'I ask appropriate questions for specific information from supervisors, specialists, and others', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'b6', text: 'I promptly inform relevant others when needing guidance with assigned tasks', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' } 
+
+        ] 
+
+    }, 
+
+    { 
+
+        type: 'Section', title: 'Section C: Professionalism', 
+
+        questions: [ 
+            { id: 'c1', text: 'I act equitably with integrity and accountability to self, others, and the organization', type: 'Multiple', options: ['A. Consider the well-being and interests of all stakeholders', 'B. I am transparent in my actions and decisions', 'C. Take ownership of myresponsibilities', 'D. I am honest and authentic in my words and actions', 'E. I am answerable for my mistakes'], correctAnswer: ['A', 'B', 'C', 'D', 'E'] }, 
+            { id: 'c2', text: 'I maintain a positive personal brand in alignment with organization and personal career values', type: 'Multiple', options: ['A. I am still trying to figure out my values', 'B. I am aware of my values however, okay to comprise in situations', 'C. I am authentic, consistent, and transparent in your personal and professional interactions', 'D. Focus on building meaningful relationships and providing value to others'], correctAnswer: ['C', 'D'] }, 
+            { id: 'c3', text: 'I research/ prepare/ do homework before attending any career/ professional event', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'c4', text: 'I report consistently for work or meetings', type: 'Multiple', options: ['A. Not really', 'B. Sometimes', 'C. I inform if required to skip', 'D. I keep my commitments'], correctAnswer: ['C', 'D'] }, 
+            { id: 'c5', text: 'I prioritize and complete tasks based on the deadline/ importance of the task', type: 'Select', options: ['A. Only if it is a critical task', 'B. Almost every time', 'C. Prefer to work adhoc on need basis'], correctAnswer: 'B' }, 
+            { id: 'c6', text: 'I consistently meet or exceed goals and expectations', type: 'Select', options: ['A. Almost always', 'B. Ocassionally', 'C. Prefer to work adhoc'], correctAnswer: 'A' }, 
+            { id: 'c7', text: 'I proof-check you work before submission', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'c8', text: "I show up on time", type: 'Select', options: ['A. Target to reach 15 mins before time', 'B. Always on time', 'C. I inform if I am going to be late', "D. It's okay to be late sometimes"], correctAnswer: 'A' }, 
+            { id: 'c9', text: 'I try to find resources your team members can use for their own work.', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'c10', text: 'I offer praises and compliments to others', type: 'Select', options: ["A. Just to make them feel good but don't really mean it", 'B. Only when I mean it', 'C. Only if it is useful for me'], correctAnswer: 'B' } 
+
+        ] 
+
+    }, 
+
+    { 
+
+        type: 'Section', title: 'Section D: Team Work', 
+
+        questions: [ 
+            { id: 'd1', text: 'I listen carefully to others, taking time to understand and ask appropriate questions without interrupting', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'd2', text: 'I effectively manage conflict, interact with and respect diverse personalities, and meet ambiguity with resilience', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'd3', text: 'I hold myself accountable for individual and team responsibilities and deliverables.', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'd4', text: 'I employ personal strengths, knowledge, and talents to complement those of others', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'd5', text: 'I exercise the ability to compromise and be agile', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'd6', text: 'I collaborate with others to achieve common goals', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'd7', text: 'I build strong, positive working relationships with supervisor and team members/coworkers', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' } 
+
+        ] 
+
+    }, 
+
+    { 
+        type: 'Section', title: 'Section E: Technology', 
+        questions: [ 
+            { id: 'e1', text: 'I navigate change effectively and be open to learning new technologies', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'e2', text: 'I use technology to improve efficiency and productivity of their work.', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'e3', text: 'I identify appropriate technology for completing specific tasks', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'e4', text: 'I manage technology to integrate information to support relevant, effective, and timely decision-making', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'e5', text: 'I quickly adapt to new or unfamiliar technologies', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'e6', text: 'I handle information, construct ideas, and use technology to achieve strategic goals', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' } 
+
+        ] 
+    }, 
+
+    { 
+        type: 'Section', title: 'Section F: Critical Thinking', 
+
+        questions: [ 
+            { id: 'f1', text: 'I make decisions and solve problems using sound, inclusive reasoning and judgment', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'f2', text: 'I gather and analyze information from a diverse set of sources and individuals to fully understand a problem', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'f3', text: 'I proactively anticipate needs and prioritize action steps', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'f4', text: 'I accurately summarize and interpret data with an awareness of personal biases that may impact outcomes', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'f5', text: 'I effectively communicate actions and rationale, recognizing the diverse perspectives and lived experiences of stakeholders', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'f6', text: 'I multi-task well in a fast-paced environment', type: 'Multiple', options: ['A. Prioritize tasks', 'B. Focus on one task at a time', 'C. Manage time efficiently', 'D. Communicate and delegate effectively', 'E. Staying organized, flexible, and adaptable and navigate changing priorities and deadlines.'], correctAnswer: ['A', 'B', 'C', 'D', 'E'] } 
+        ] 
+
+    }, 
+
+    { 
+
+        type: 'Section', title: 'Section H: Leadership', 
+
+        questions: [ 
+            { id: 'h1', text: 'I inspire, persuade, and motivate self and others under a shared vision', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'h2', text: 'I seek out and leverage diverse resources and feedback from others to inform direction', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'h3', text: 'I use innovative thinking to go beyond traditional methods', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'h4', text: 'I serve as a role model to others by approaching tasks with confidence and a positive attitude', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'h5', text: 'I motivate and inspire others by encouraging them and by building mutual trust', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' }, 
+            { id: 'h6', text: 'I plan, initiate, manage, complete, and evaluate projects', type: 'Yes/No', options: ['Yes', 'No'], correctAnswer: 'Yes' } 
+        ] 
+    } 
+];
+
+const feedbackData = [ 
+    { range: [0, 60], message: "Don't Worry!\n\nWe have you covered. To be able to score better, please actively participate in the 'IAC activities', https://www.industryacademiacommunity.com/s/pages/benefits" }, 
+    { range: [61, 90], message: "Not Bad!\n\nYou are almost there. For improving your 'Career Readiness', please actively participate in the 'IAC activities', https://www.industryacademiacommunity.com/s/pages/benefits" }, 
+    { range: [91, 100], message: "Congratulations! You are Career Ready!\n\nIt is great to see that you are ready to succeed in the Professional World. To get career updates and 'Continuous Professional Development' for 'Career Success', Please participate in the IAC activities, https://www.industryacademiacommunity.com/s/pages/benefits" } 
+]; 
+
+document.addEventListener('DOMContentLoaded', function() { 
+    const questionsContainer = document.getElementById('questionsContainer'); 
+    // --- RENDER QUIZ QUESTIONS --- 
+    // MODIFIED: This loop now only processes 'Section' types 
+    quizData.forEach(item => { 
+        if (item.type === 'Section') { 
+            const sectionTitle = document.createElement('h2'); 
+            sectionTitle.textContent = item.title; 
+            questionsContainer.appendChild(sectionTitle); 
+            item.questions.forEach(q => { 
+                const questionDiv = document.createElement('div'); 
+                questionDiv.className = 'question-item'; 
+                const questionText = document.createElement('span'); 
+                questionText.className = 'question-text'; 
+                questionText.textContent = q.text; 
+                questionDiv.appendChild(questionText); 
+                const optionsDiv = document.createElement('div'); 
+                optionsDiv.className = 'options-group'; 
+                if (q.type === 'Yes/No' || q.type === 'Select') { 
+                    q.options.forEach(opt => { 
+                        const label = document.createElement('label'); 
+                        const radio = document.createElement('input'); 
+                        radio.type = 'radio'; 
+                        radio.name = q.id; 
+                        radio.value = opt; 
+                        radio.required = true; // All scorable questions are required 
+                        label.appendChild(radio); 
+                        label.appendChild(document.createTextNode(opt)); 
+                        optionsDiv.appendChild(label); 
+                    }); 
+                } else if (q.type === 'Multiple') { 
+                     // Checkbox questions are not set to 'required' as they are handled by custom validation 
+                     q.options.forEach(opt => { 
+                        const label = document.createElement('label'); 
+                        const checkbox = document.createElement('input'); 
+                        checkbox.type = 'checkbox'; 
+                        checkbox.name = q.id; 
+                        checkbox.value = opt.substring(0, 1); 
+                        label.appendChild(checkbox); 
+                        label.appendChild(document.createTextNode(opt)); 
+                        optionsDiv.appendChild(label); 
+                    }); 
+                } else if (q.type === 'Subjective') { 
+                    const textarea = document.createElement('textarea'); 
+                    textarea.name = q.id; 
+                    textarea.rows = 3; 
+                    textarea.placeholder = "Your answer here (not scored)"; 
+                    optionsDiv.appendChild(textarea); 
+                } 
+                questionDiv.appendChild(optionsDiv); 
+                questionsContainer.appendChild(questionDiv); 
+            }); 
+        } 
+    }); 
+    // --- FORM SUBMISSION LOGIC --- 
+    const form = document.getElementById('careerQuizForm'); 
+    form.addEventListener('submit', function(e) { 
+        e.preventDefault(); 
+        const validationErrorDiv = document.getElementById('validationError'); 
+        validationErrorDiv.classList.add('hidden'); 
+        // --- START: MODIFIED VALIDATION LOGIC --- 
+        const formData = new FormData(form); // Moved to the top 
+        let allValid = true; 
+        // 1. Check standard HTML5 validation for required fields (radios, text, email) 
+        if (!form.checkValidity()) { 
+            allValid = false; 
+        } 
+        // 2. Custom validation for multiple-choice questions (checkboxes) 
+        quizData.forEach(section => { 
+            if (section.type !== 'Section') return; 
+            section.questions.forEach(q => { 
+                if (q.type === 'Multiple') { 
+                    const questionDiv = form.elements[q.id]?.[0]?.closest('.question-item'); 
+                    // Check if a checkbox group for this question exists and if no option has been selected 
+                    if (form.elements[q.id] && !formData.has(q.id)) { 
+                        allValid = false; 
+                        if (questionDiv) { 
+                            questionDiv.style.border = '2px solid #c0392b'; // Highlight unanswered question 
+                        } 
+                    } else if (questionDiv) { 
+                        questionDiv.style.border = '1px solid #ddd'; // Reset border if valid 
+                    } 
+                } 
+            }); 
+        }); 
+        if(!allValid) { 
+            validationErrorDiv.textContent = "Please answer all questions. Unanswered questions are highlighted in red."; 
+            validationErrorDiv.classList.remove('hidden'); 
+            form.reportValidity(); // This shows default browser popups for invalid :required fields 
+            return; 
+        } 
+        // --- END: MODIFIED VALIDATION LOGIC --- 
+        const submitButton = document.getElementById('submitButton'); 
+        const loader = document.getElementById('loader'); 
+        submitButton.disabled = true; 
+        loader.classList.remove('hidden'); 
+        form.classList.add('hidden'); 
+        // Note: formData is already created from the validation step above. 
+        const submissionData = { 
+            name: formData.get('userName'), 
+            email: formData.get('userEmail'), 
+            answers: {} 
+        }; 
+        let currentScore = 0; 
+        let maxScore = 0; 
+        // --- CALCULATE RAW SCORE AND MAX SCORE --- 
+        quizData.forEach(item => { 
+            if (item.type !== 'Section') return; 
+            item.questions.forEach(q => { 
+                if (q.type === 'Yes/No' || q.type === 'Select') { 
+                    maxScore += 1; 
+                    const userAnswer = formData.get(q.id); 
+                    if (userAnswer && userAnswer.startsWith(q.correctAnswer)) { 
+                        currentScore++; 
+                    } 
+                    submissionData.answers[q.id] = userAnswer || 'N/A'; 
+                } else if (q.type === 'Multiple') { 
+                    maxScore += q.correctAnswer.length; 
+                    const userAnswers = formData.getAll(q.id); 
+                    let selectedAnswers = []; 
+                    userAnswers.forEach(ans => { 
+                        if (q.correctAnswer.includes(ans)) { 
+                            currentScore++; 
+                        } 
+                        // Find the full text for the selected answer to save it 
+                        const fullAnswerText = q.options.find(opt => opt.startsWith(ans)); 
+                        selectedAnswers.push(fullAnswerText || ans); 
+                    }); 
+                    submissionData.answers[q.id] = selectedAnswers.join(', ') || 'N/A'; 
+                } else if (q.type === 'Subjective') { 
+                     submissionData.answers[q.id] = formData.get(q.id) || 'N/A'; 
+                } 
+            }); 
+        }); 
+        // --- CALCULATE FINAL SCORE (SCALED TO 100) --- 
+        const finalScore = maxScore > 0 ? Math.round((currentScore / maxScore) * 100) : 0; 
+        submissionData.finalScore = finalScore; 
+        // --- FIND AND DISPLAY FEEDBACK --- 
+        let feedbackMessage = "No feedback available for this score."; 
+        for(const fb of feedbackData) { 
+            if (finalScore >= fb.range[0] && finalScore <= fb.range[1]) { 
+                feedbackMessage = fb.message; 
+                break; 
+            } 
+        } 
+        submissionData.feedback = feedbackMessage; 
+        const resultsDiv = document.getElementById('results'); 
+        document.getElementById('resultName').textContent = submissionData.name; 
+        document.getElementById('finalScoreDisplay').textContent = finalScore; 
+        const feedbackDiv = document.getElementById('resultFeedback'); 
+        feedbackDiv.innerHTML = feedbackMessage.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'); 
+        resultsDiv.classList.remove('hidden'); 
+        loader.classList.add('hidden'); 
+        resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' }); 
+        // --- SEND DATA TO GOOGLE SHEET --- 
+        const saveStatus = document.getElementById('saveStatus'); 
+        saveStatus.textContent = "Saving your responses..."; 
+        google.script.run 
+            .withSuccessHandler(response => { 
+                saveStatus.textContent = response.success ? "Your responses have been saved. Thank you!" : "Failed to save responses: " + response.message; 
+            }) 
+            .withFailureHandler(error => { 
+                saveStatus.textContent = "Error connecting to server to save responses: " + error.message; 
+            }) 
+            .saveData(submissionData); 
+    });
+}); 
+</script> 
+</body> 
+</html> 
+
+ 

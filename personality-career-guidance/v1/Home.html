@@ -1,0 +1,610 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+  <meta charset="UTF-8"> 
+  <base target="_top"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>Personality Based Career Guidance</title>
+  <style> 
+    :root { 
+      --dark-blue: #273755; 
+      --yellow: #FEC601; 
+      --orange: #EA7317; 
+      --cyan: #3DA5D9; 
+      --light-grey: #f4f7f9; 
+      --medium-grey: #e0e0e0; 
+      --white: #ffffff; 
+      --dark-text: #333; 
+    } 
+    body { 
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; 
+      background-color: var(--light-grey); 
+      margin: 0; 
+      padding: 20px; 
+      color: var(--dark-text); 
+    } 
+    .container { 
+      max-width: 800px; 
+      margin: 0 auto; 
+      background-color: var(--white); 
+      padding: 2.5rem; 
+      border-radius: 12px; 
+      box-shadow: 0 8px 24px rgba(39, 55, 85, 0.08); 
+    } 
+    
+    h1 { 
+      color: var(--dark-blue); 
+      text-align: center; 
+      border-bottom: 2px solid var(--light-grey); 
+      padding-bottom: 15px; 
+      margin-top: 0; 
+    } 
+    h2 { 
+      color: var(--dark-blue); 
+      border-bottom: 1px solid #eee; 
+      padding-bottom: 10px; 
+    } 
+    h3, h4 { 
+      color: var(--dark-blue); 
+    } 
+
+     /* ---- styles for logo ---- */
+    .header {position: relative; width: 100%; }
+    .top-row {display: flex; justify-content: space-between; align-items: flex-start; }
+    .center-row { margin-top: 0px; text-align: center;}
+    .logo-right {height: 50px; }
+    .logo-right {height: 70px; }
+    .logo-center {height: 50px; }
+
+    /* Intro Box */ 
+    .intro-box { 
+      background-color: #f9fafb; 
+      border: 1px solid var(--medium-grey); 
+      border-left: 5px solid var(--dark-blue); 
+      padding: 20px 25px; 
+      margin-bottom: 2.5rem; 
+      border-radius: 8px; 
+    } 
+    .intro-box h3 { 
+      margin-top: 0; 
+      font-size: 1.2em; 
+    } 
+    .intro-box h4 { 
+      margin-top: 15px; 
+      margin-bottom: 8px; 
+      font-size: 1.05em; 
+    } 
+    .intro-box p, .intro-box li { 
+      margin-bottom: 10px; 
+      font-size: 0.95em; 
+      line-height: 1.6; 
+      color: #444; 
+    } 
+    .intro-box ul { 
+      list-style-position: inside; 
+      padding-left: 5px; 
+      margin-top: 0; 
+    } 
+
+    /* Input Group */ 
+    .input-group { 
+      margin-bottom: 1rem; 
+    } 
+    .input-group label { 
+      display: block; 
+      font-weight: 500; 
+      margin-bottom: 0.5rem; 
+    } 
+    .input-group input { 
+      width: 100%; 
+      padding: 12px; 
+      border: 1px solid #ccc; 
+      border-radius: 6px; 
+      box-sizing: border-box; 
+      transition: border-color 0.3s, box-shadow 0.3s; 
+    } 
+
+    .input-group input:focus { 
+      border-color: var(--dark-blue); 
+      box-shadow: 0 0 0 3px rgba(39, 55, 85, 0.1); 
+      outline: none; 
+    } 
+    /* Questions & Ratings */ 
+    .question-block { 
+      padding: 1.25rem 0; 
+      border-bottom: 1px solid #f0f0f0; 
+    } 
+    .question-block:last-child { 
+      border-bottom: none; 
+    } 
+    .question-text { 
+      font-weight: 500; 
+      margin-bottom: 1rem; 
+    } 
+    .rating-group { 
+      display: flex; 
+      align-items: center; 
+      gap: 20px; 
+    } 
+    .rating-group input[type="radio"] { 
+      display: none; 
+    } 
+    .rating-group label { 
+      height: 40px; 
+      width: 40px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      border-radius: 50%; 
+      background-color: #f0f0f0; 
+      color: var(--dark-text); 
+      font-weight: bold; 
+      cursor: pointer; 
+      transition: all 0.2s ease-in-out; 
+    } 
+
+    .rating-group label:hover { 
+      background-color: var(--orange); 
+      color: var(--white); 
+      transform: scale(1.1); 
+    } 
+
+    .rating-group input[type="radio"]:checked + label { 
+      background-color: var(--dark-blue); 
+      color: var(--white); 
+      transform: scale(1.1); 
+      box-shadow: 0 4px 10px rgba(39, 55, 85, 0.3); 
+    } 
+
+    /* Error Messages */ 
+    .error-message { 
+      color: var(--orange); 
+      font-weight: 500; 
+      font-size: 0.9rem; 
+      margin-top: 5px; 
+      display: none; 
+    } 
+
+    /* Buttons */ 
+    button { 
+      display: block; 
+      width: 100%; 
+      padding: 15px; 
+      font-size: 1.2rem; 
+      font-weight: bold; 
+      color: var(--white); 
+      background-color: var(--dark-blue); 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      margin-top: 2rem; 
+      transition: background-color 0.3s ease, transform 0.1s ease; 
+    } 
+
+    button:hover { 
+      background-color: var(--orange); 
+    } 
+
+    button:active { 
+      transform: scale(0.99); 
+    } 
+    #loader { 
+      text-align: center; 
+      font-size: 1.2rem; 
+      padding: 2rem; 
+      display: none; 
+    } 
+
+    #results { 
+      margin-top: 2rem; 
+      display: none; 
+    } 
+
+    #personality-type { 
+      background-color: var(--dark-blue); 
+      color: var(--yellow); 
+      padding: 1rem 1.5rem; 
+      border-radius: 8px; 
+      text-align: center; 
+      margin-bottom: 2rem; 
+    } 
+    #personality-type p { 
+      margin: 0; 
+      font-size: 1.2rem;
+    } 
+    #personality-type strong { 
+      font-size: 1.8rem; 
+      display: block; 
+      margin-top: 5px; 
+    } 
+    #score-details { 
+      margin-top: 2rem; 
+    } 
+    .score-bar { 
+      margin-bottom: 1rem; 
+    } 
+    .score-label { 
+      display: flex; 
+      justify-content: space-between; 
+      font-weight: 500; 
+      margin-bottom: 5px; 
+    } 
+    .progress-container { 
+      height: 20px; 
+      width: 100%; 
+      background-color: var(--medium-grey); 
+      border-radius: 10px; 
+    } 
+    .progress-bar { 
+      height: 100%; 
+      background-color: var(--cyan); 
+      border-radius: 10px; 
+      padding-right: 8px; 
+      box-sizing: border-box; 
+      transition: width 0.5s ease-in-out; 
+      width: 0; 
+    } 
+    /* ADD THESE NEW CLASSES */
+    .progress-bar.thinker { background-color: var(--dark-blue); }
+    .progress-bar.leader { background-color: var(--cyan); }
+    .progress-bar.entrepreneur { background-color: var(--orange); }
+    .progress-bar.creator { background-color: var(--yellow); }
+        /* Career Roadmap Cards */ 
+    .roadmap-grid { 
+      display: grid; 
+      grid-template-columns: 1fr; 
+      gap: 2rem; 
+      margin-top: 1.5rem; 
+    } 
+    @media (min-width: 768px) { 
+      .roadmap-grid { 
+        grid-template-columns: 1fr 1fr; 
+      } 
+    } 
+    .recommendation-card { 
+      border: 1px solid var(--medium-grey); 
+      border-radius: 12px; 
+      overflow: hidden; 
+      box-shadow: 0 4px 12px rgba(39, 55, 85, 0.05); 
+      transition: transform 0.3s ease, box-shadow 0.3s ease; 
+    } 
+    .recommendation-card:hover { 
+      transform: translateY(-5px); 
+      box-shadow: 0 8px 20px rgba(39, 55, 85, 0.1); 
+    } 
+    .card-header { 
+      display: flex; 
+      align-items: center; 
+      gap: 12px; 
+      padding: 1rem 1.25rem; 
+      color: var(--white); 
+    } 
+    .card-header h3 { 
+      margin: 0; 
+      font-size: 1.5rem; 
+      color: inherit; 
+    } 
+    .card-body { 
+      padding: 1.5rem 1.25rem; 
+    } 
+    .phase-section { 
+      margin-bottom: 1.5rem; 
+      padding-bottom: 1.5rem; 
+      border-bottom: 1px solid #f0f0f0; 
+    } 
+
+    .phase-section:last-of-type { 
+      margin-bottom: 0; 
+      padding-bottom: 0; 
+      border-bottom: none; 
+    } 
+    .phase-section p { 
+      margin: 0; 
+      line-height: 1.6; 
+      color: #444; 
+    } 
+    .domains-container { 
+      margin-top: 1.5rem; 
+      padding-top: 1.5rem; 
+      border-top: 1px solid #f0f0f0; 
+    } 
+    .domains-container h4 { 
+      margin-top: 0; 
+      margin-bottom: 1rem; 
+      font-size: 1rem; 
+    } 
+    .domain-tag { 
+      display: inline-block; 
+      background-color: transparent; 
+      color: var(--dark-blue); 
+      padding: 5px 12px; 
+      margin: 4px 3px; 
+      border-radius: 16px; 
+      font-size: 0.85em; 
+      font-weight: 500; 
+      border: 1px solid var(--medium-grey); 
+      transition: all 0.2s ease; 
+    } 
+    .domain-tag:hover { 
+      background-color: var(--light-grey); 
+      border-color: var(--dark-blue); 
+    } 
+    /* Personality Colors */ 
+    .thinker-bg { background-color: var(--dark-blue); } 
+    .leader-bg { background-color: var(--cyan); } 
+    .entrepreneur-bg { background-color: var(--orange); } 
+    .creator-bg { background-color: var(--yellow); } 
+  </style> 
+</head> 
+<body> 
+  <div class="container"> 
+    <div class="header">
+        <div class="top-row">
+            <img class="logo-left"
+                src="https://drive.google.com/thumbnail?id=1Y8XsMTlhUIRytbtXGWJnidO9EbyyiHF4&sz=w110"
+                alt="Left Logo">
+
+            <img class="logo-right"
+                src="https://drive.google.com/thumbnail?id=1P7zwTpkuRCGEyVHXnJVgkJG68ZTsb_Xv&sz=w130"
+                alt="Right Logo">
+        </div>
+        <div class="center-row">
+            <img class="logo-center"
+                src="https://drive.google.com/thumbnail?id=1BziX8hratrGSp0s8KWG-btwcd2Rpq2vO&sz=w110"
+                alt="Center Logo">
+        </div>
+    </div>
+
+    <h1>Personality Based Career Guidance</h1> 
+    <div class="intro-box" id="introBox"> 
+      <h3>Assessment Instructions</h3> 
+      <h4>Purpose of the Assessment</h4> 
+      <p>This assessment is designed to identify your core personality archetypes - <strong>Thinker, Leader, Entrepreneur, Creator</strong>. It's a tool for self-discovery to help you understand your natural inclinations and explore career paths where you are most likely to thrive.</p> 
+      <h4>Before You Begin:</h4> 
+      <ul> 
+        <li>Find a comfortable space where you can answer thoughtfully without interruption.</li> 
+        <li>Allocate about 5-7 minutes to complete the assessment.</li> 
+        <li>Approach each question with honesty. The more authentic your answers, the more accurate your results will be.</li> 
+      </ul> 
+      <h4>Tips to Answer Effectively:</h4> 
+      <ul> 
+        <li>Rate yourself on a scale of 1 to 5 for each statement:<br> 
+          <strong>1</strong> = Strongly Disagree | <strong>2</strong> = Disagree | <strong>3</strong> = Neutral | <strong>4</strong> = Agree | <strong>5</strong> = Strongly Agree 
+        </li> 
+        <li>Don't overthink your answers; your initial gut reaction is often the most accurate.</li> 
+        <li>There are no right or wrong answers. This is about understanding your unique self.</li> 
+      </ul> 
+      <h4>After You Complete:</h4> 
+      <ul> 
+        <li>You will discover your two dominant personality archetypes.</li> 
+        <li>You'll see a full score breakdown showing how you rate across all four archetypes.</li> 
+        <li>You will receive a detailed <strong>Career Roadmap</strong> and a list of <strong>Suggested Domains</strong> for your dominant types.</li> 
+      </ul> 
+      <h4>Reminder:</h4> 
+      <p>Your personality is a powerful asset in your career journey. Use these results not as a rigid rule, but as a guide to help you make more informed and fulfilling professional choices.</p> 
+    </div> 
+    <form id="assessmentForm" novalidate> 
+      <h2>Your Details</h2> 
+      <div class="input-group"> 
+        <label for="name">Your Full Name</label> 
+        <input type="text" id="name" name="candidateName"> 
+        <div class="error-message" id="error-name"></div> 
+      </div> 
+      <div class="input-group"> 
+        <label for="email">Your Registered Email ID with IAC:</label> 
+        <input type="email" id="email" name="candidateEmail"> 
+        <div class="error-message" id="error-email"></div> 
+      </div> 
+      <div class="input-group"> 
+        <label for="internId">Intern ID</label> 
+        <input type="text" id="internId" name="internId"> 
+        <div class="error-message" id="error-internId"></div> 
+      </div> 
+      <!-- <div class="input-group"> 
+        <label for="assessmentDate">Date</label> 
+        <input type="date" id="assessmentDate" name="assessmentDate"> 
+        <div class="error-message" id="error-assessmentDate"></div> 
+      </div>  -->
+      <h2>Questionnaire</h2> 
+      <div id="questionnaire"></div> 
+      <button type="submit">View My Results</button> 
+    </form> 
+    <div id="loader">Analyzing your responses...</div> 
+    <div id="results"> 
+      <div id="personality-type"></div> 
+      <div id="score-details"></div> 
+      <div id="recommendations"></div> 
+    </div> 
+  </div> 
+  <script> 
+    const fullQuestions = [ 
+      "I enjoy gaining deep knowledge and understanding principles behind things.", 
+      "I'm inclined toward research, introspection, or philosophical questions.", 
+      "I feel fulfilled when helping others learn or mentoring people.", 
+      "I prefer calm, structured environments over fast-paced settings.", 
+      "Ethics, truth, and wisdom are more important to me than material success.", 
+      "I'm comfortable making tough decisions under pressure.", 
+      "I feel responsible for protecting or standing up for others.", 
+      "I thrive in roles that require courage, discipline, and leadership.", 
+      "I have a strong sense of justice and fairness.", 
+      "I enjoy organizing, managing people or resources toward a goal.", 
+      "I have a good sense for opportunities or financial potential.", 
+      "I enjoy creating systems or businesses that generate value.", 
+      "I'm good at networking and building mutually beneficial relationships.", 
+      "I enjoy thinking strategically about money, growth, and outcomes.", 
+      "I am comfortable taking calculated risks for gains.", 
+      "I take pride in doing things that help others, even behind the scenes.", 
+      "I prefer doing things hands-on rather than theoretical planning.", 
+      "I feel satisfied when I contribute to a team, even without recognition.", 
+      "I enjoy creative expression through music, arts, craft, or movement.", 
+      "I am loyal, dependable, and find joy in consistent routines." 
+    ]; 
+    function buildQuestionnaire() { 
+      const questionnaireDiv = document.getElementById('questionnaire'); 
+      let html = ''; 
+      fullQuestions.forEach((q, index) => { 
+        const qNum = index + 1; 
+        html += ` 
+          <div class="question-block" id="question-block-${qNum}"> 
+            <p class="question-text">${qNum}. ${q}</p> 
+            <div class="rating-group"> 
+        `; 
+        for (let i = 1; i <= 5; i++) { 
+          html += `<input type="radio" id="q${qNum}r${i}" name="q${qNum}" value="${i}"> 
+                   <label for="q${qNum}r${i}">${i}</label>`; 
+        } 
+        html += ` 
+            </div> 
+            <div class="error-message" id="error-q${qNum}"></div> 
+          </div> 
+        `; 
+      }); 
+      questionnaireDiv.innerHTML = html; 
+    } 
+    function validateForm() { 
+      document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none'); 
+      const nameInput = document.getElementById('name'); 
+      if (nameInput.value.trim() === '') { 
+        document.getElementById('error-name').textContent = 'Please enter your full name.'; 
+        document.getElementById('error-name').style.display = 'block'; 
+        nameInput.focus(); 
+        return false; 
+      } 
+      const emailInput = document.getElementById('email'); 
+      if (emailInput.value.trim() === '') { 
+        document.getElementById('error-email').textContent = 'Please enter your email address.'; 
+        document.getElementById('error-email').style.display = 'block'; 
+        emailInput.focus(); 
+        return false; 
+      } 
+      const emailPattern = /^\S+@\S+\.\S+$/; 
+      if (!emailPattern.test(emailInput.value.trim())) { 
+        document.getElementById('error-email').textContent = 'Please enter a valid email format.'; 
+        document.getElementById('error-email').style.display = 'block'; 
+        emailInput.focus(); 
+        return false; 
+      } 
+      const internIdInput = document.getElementById('internId'); 
+      if (internIdInput.value.trim() === '') { 
+        document.getElementById('error-internId').textContent = 'Please enter your Intern ID.'; 
+        document.getElementById('error-internId').style.display = 'block'; 
+        internIdInput.focus(); 
+        return false; 
+      } 
+      // const dateInput = document.getElementById('assessmentDate'); 
+      // if (dateInput.value.trim() === '') { 
+      //   document.getElementById('error-assessmentDate').textContent = 'Please select the date.'; 
+      //   document.getElementById('error-assessmentDate').style.display = 'block'; 
+      //   dateInput.focus(); 
+      //   return false; 
+      // } 
+      for (let i = 1; i <= fullQuestions.length; i++) { 
+        if (!document.querySelector(`input[name="q${i}"]:checked`)) { 
+          const errorDiv = document.getElementById(`error-q${i}`); 
+          errorDiv.textContent = 'Please select an answer.'; 
+          errorDiv.style.display = 'block'; 
+          document.getElementById(`question-block-${i}`).scrollIntoView({ behavior: 'smooth', block: 'center' }); 
+          return false; 
+        } 
+      } 
+      return true; 
+    } 
+
+    document.addEventListener('DOMContentLoaded', buildQuestionnaire); 
+    document.getElementById('assessmentForm').addEventListener('submit', function(e) { 
+      e.preventDefault(); 
+      if (validateForm()) { 
+        document.getElementById('introBox').style.display = 'none'; 
+        document.getElementById('assessmentForm').style.display = 'none'; 
+        document.getElementById('loader').style.display = 'block'; 
+        // Collect form data
+        const formData = new FormData(e.target);
+        const formObject = {};
+        formData.forEach((value, key) => {
+          formObject[key] = value;
+        });
+        formObject.assessmentDate = new Date().toISOString().split('T')[0];
+        
+        // Call backend
+        google.script.run
+          .withSuccessHandler(showResults)
+          .withFailureHandler(function(error) {
+            document.getElementById('loader').style.display = 'none';
+            alert('Error: ' + error.message);
+            document.getElementById('assessmentForm').style.display = 'block';
+          })
+          .processAssessment(formObject);
+      } 
+    }); 
+    // Sample showResults function (you can customize with actual data) 
+    function showResults(results) { 
+      document.getElementById('loader').style.display = 'none'; 
+      const personalityDiv = document.getElementById('personality-type'); 
+      personalityDiv.innerHTML = `<p>Your dominant personality combination is:</p><strong>${results.dominantCombination}</strong>`; 
+      const scoreDetailsDiv = document.getElementById('score-details'); 
+      if (results.allScores) { 
+        let scoreHtml = '<h2>Your Score Breakdown</h2>'; 
+        for (const archetype in results.allScores) { 
+          const score = results.allScores[archetype]; 
+          const percentage = (score / 25) * 100; 
+          const colorClass = archetype.toLowerCase(); // thinker, leader, entrepreneur, creator
+          scoreHtml += ` 
+            <div class="score-bar"> 
+              <div class="score-label"><span>${archetype}</span><span>${score} / 25</span></div> 
+              <div class="progress-container"> 
+                <div class="progress-bar ${colorClass}" style="width: 0%;" data-width="${percentage}%"></div> 
+              </div> 
+            </div> 
+          `; 
+        }
+        scoreDetailsDiv.innerHTML = scoreHtml; 
+        setTimeout(() => { 
+          document.querySelectorAll('.progress-bar').forEach(bar => { 
+            bar.style.width = bar.getAttribute('data-width'); 
+          }); 
+        }, 100); 
+      }
+
+      // Career Roadmap 
+      const recommendationsDiv = document.getElementById('recommendations'); 
+      let recHtml = '<h2>Career Roadmap</h2><div class="roadmap-grid">'; 
+      const icons = { 
+        Thinker: '🧠', 
+        Leader: '⭐', 
+        Entrepreneur: '💼', 
+        Creator: '🎨' 
+      }; 
+      results.recommendations.forEach(rec => { 
+        const typeClass = rec.title.toLowerCase(); 
+        recHtml += ` 
+          <div class="recommendation-card"> 
+            <div class="card-header ${typeClass}-bg"> 
+              <span style="font-size:2rem;">${icons[rec.title] || '📊'}</span>
+              <h3>${rec.title}</h3>
+            </div> 
+            <div class="card-body"> 
+              <div class="phase-section"><p>${rec.phase1}</p></div> 
+              <div class="phase-section"><p>${rec.phase2}</p></div> 
+              <div class="phase-section"><p>${rec.phase3}</p></div> 
+        `; 
+        if (rec.domains && rec.domains.length > 0) { 
+          recHtml += '<div class="domains-container"><h4>Suggested Domains</h4>'; 
+          rec.domains.forEach(domain => { 
+            recHtml += `<span class="domain-tag">${domain}</span>`; 
+          }); 
+          recHtml += '</div>'; 
+        } 
+        recHtml += '</div></div>'; 
+      }); 
+      recHtml += '</div>'; 
+      recommendationsDiv.innerHTML = recHtml; 
+      document.getElementById('results').style.display = 'block'; 
+      window.scrollTo({ top: 0, behavior: 'smooth' }); 
+    } 
+  </script> 
+</body> 
+</html> 
+
+ 
+
+ 

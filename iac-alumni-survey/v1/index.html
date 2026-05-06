@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>IAC Alumni Survey</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- <?!= include('style'); ?> -->
+    <script src="config.js"></script>
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <div class="header-row"> 
+                <div class="header-content">
+                    <h1>IAC Alumni Survey🌟</h1>
+                    <p class="lead">Answer one question at a time. Share your IAC experience with us.</p>
+                </div>
+                <div class="info-wrapper">
+                    <button class="info-button" onclick="toggleInfoPanel()" aria-label="Information">ℹ️</button>
+                    <div id="infoPanel" class="info-panel">
+                        <div style="font-weight: 600; color: var(--primary); margin-bottom: 6px;">📋 About This Survey</div>
+                        This survey helps you share your IAC experience with us. It will enhance your networking opportunities and 
+                        connection with the IAC community. Your responses help us improve our programs for future alumni.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progress"></div>
+        </div>
+
+        <!-- Questions Container -->
+        <div class="question-wrap" id="questionWrap"></div>
+
+        <!-- Navigation Controls -->
+         <div class="controls" aria-live="polite" style="display:none;">
+            <div class="left">
+                <button id="prevBtn" class="btn ghost" onclick="prev()">← Previous</button>
+            </div>
+            <div class="right">
+                <div id="stepHint" class="small-muted" style="min-width:120px; text-align:right;"></div>
+                <button id="nextBtn" class="btn" onclick="nextOrSubmit()">Next →</button>
+            </div>
+        </div>
+
+        <!-- Footer Text -->
+        <div class="footer-text" style="text-align: center; margin-top: 20px; padding: 16px; color: #64748b; font-size: 14px; font-style: italic;">
+            Each answer you share adds a new thread to the fabric of IAC
+        </div>
+
+        <!-- Thank You Screen -->
+        <div id="thankyou" style="display:none; margin-top:18px; text-align:center;">
+            <h2 id="thanksTitle">🎉 Thank you!</h2>
+
+            <!-- Community Links -->
+            <div style="display:flex; gap:12px; justify-content:center; margin-top:16px; max-width:400px; margin-left:auto; margin-right:auto;">
+                <a id="tagMangoBtn" href="#" target="_blank" rel="noopener noreferrer" style="flex:1;">
+                    <button class="btn" style="width:100%; background:#f97316; border-color:#f97316; color:white;">
+                        IAC Community
+                    </button>
+                </a>
+                <a id="whatsappBtn" href="#" target="_blank" rel="noopener noreferrer" style="flex:1;">
+                    <button class="btn" style="width:100%; background:#25D366; border-color:#25D366; color:white;">
+                        WhatsApp Channel
+                    </button>
+                </a>
+            </div>
+
+            <!-- Certificate Display -->
+            <div id="certificateWrap" style="margin-top:24px;"></div>
+
+            <!-- Description Text -->
+            <p style="margin:16px 0 12px; color:#64748b; font-size:14px;">
+                Thank you for submitting your details — you can join our community to receive daily updates & 
+                professional development articles.
+            </p>
+            
+            <!-- Download Buttons -->
+            <div id="certButtons" style="display:flex; gap:12px; justify-content:center; margin-top:12px; max-width:400px; margin-left:auto; margin-right:auto;"></div>
+        </div>
+    </div>
+    
+    <script>
+        
+        // Global variables
+        let questions = [];
+        let current = 0;
+        let formState = {};
+        let statusInjected = false;
+        let lastServerResult = {};
+        const qWrap = document.getElementById('questionWrap');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progressBar = document.getElementById('progress');
+        const TAGMANGO_URL = 'https://careers.industryacademiacommunity.com';
+        const WHATSAPP_URL = 'https://whatsapp.com/channel/0029VaKRwJ6GOj9lRe7Jgw1p';
+
+        // import { getStatusQuestions } from "./questions.js";
+
+
+        // Initial Questions
+        const initialQuestions = [
+            {
+                id: 'welcome', type: 'welcome', title: 'Welcome to the IAC Story Builder', help: 'Short & friendly — answer one question at a time.'
+            },
+            {
+                id: 'name', type: 'input', title: "Please enter your full name", placeholder: 'e.g. Priya Sharma'
+            },
+            {
+                id: 'email', type: 'email', title: "Your professional/Personal email ID?", placeholder: 'name@company.com',
+                // tooltip: 'We use your email to send you updates and keep you connected with the IAC community. Your email will not be shared with third parties.'
+            },
+            {
+                id: 'status', type: 'select', title: 'What best describes your current status?',  options: ['Student', 'Fresher', 'Employed', 'Professionals on Career Break']
+            }
+        ];
+        function getStatusQuestions(status) {
+            const statusLower = (status || '').toLowerCase();
+            const questions = [];
+
+            if (statusLower === 'student') {
+                questions.push(
+                    { 
+                        id: 'st_highlight', 
+                        type: 'textarea', 
+                        title: 'Is there any recent learning experience, project, or achievement you would like to share?',
+                        placeholder: 'Share any recent accomplishments, projects, or learning experiences that you\'re proud of.',
+                        helptext: 'Think about what you learned, experienced, or gained through IAC — it could be a skill, a mindset shift, or a moment that stood out for you.'
+                    },
+                    { 
+                        id: 'st_iacProgram', 
+                        type: 'chips', 
+                        title: 'Which of the following IAC activities have you been a part of?', 
+                        options: ['1:1 Internship', 'GPI/Internship Program', 'Industry Training', 'Workshops(webinar, expert interactions)', 'Entrepreneurship Programs'],
+                        helpText: 'You may select more than one option',
+                    },
+                    { 
+                        id: 'st_experience', 
+                        type: 'scale', 
+                        title: 'How would you rate your overall experience while participating in activities on the IAC platform?', 
+                        scale: [1, 2, 3, 4, 5] 
+                    },
+                    { 
+                        id: 'st_offerings', 
+                        type: 'select', 
+                        title: 'Which of the offerings from IAC supported in your career growth and learning?', 
+                        options: ['1:1 Internship', 'GPI / Internship Program', 'Industry Training', 'Workshops', 'Entrepreneurship Programs', 'Networking & Community Engagement'] 
+                    },
+                    { 
+                        id: 'st_takeaways', 
+                        type: 'textarea', 
+                        title: 'What did you learn or experience at IAC that really stood out for you?',
+                        placeholder: 'Think about what you learned, experienced, or gained through IAC — it could be a skill, a mindset shift, or a moment that stood out for you.'
+                    },
+                    {   
+                        id: 'st_recommend', 
+                        type: 'scale', 
+                        title: 'On a scale of 1-10, how likely are you to recommend IAC to a friend or colleague?',  
+                        scale: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                        helpText: '9-10 = Highly likely to recommend, 7-8 = Moderately likely, 1-6 = Unlikely to recommend.'
+                    },
+                    { 
+                        id: 'st_recommendFor', 
+                        type: 'select', 
+                        title: 'For which of the following mentioned would you recommend IAC to anyone?', 
+                        options: ['For Industry Exposure (Events)', 'For Internship', 'For Jobs', 'For Entrepreneurship', 'Mentorship'] 
+                    },
+                    { 
+                        id: 'st_missed', 
+                        type: 'textarea', 
+                        title: 'Was there anything we missed?',
+                        placeholder: 'This question\'s response will help us to understand about the improvements we have to make for better user engagement.',
+                        helptext: 'This question response will help us to understand about the improvements we have to make for better user engagement.'
+                    },
+                    { 
+                        id: 'st_futureOpportunities', 
+                        type: 'select', 
+                        title: 'In pursuing your new career paths, would you return to IAC for support or roles?', 
+                        options: ['Yes - I would definitely consider IAC for future career opportunities', 'No - I do not plan to seek future opportunities through IAC'] 
+                    },
+                    { 
+                        id: 'st_supportJourney', 
+                        type: 'select', 
+                        title: 'How can IAC best support your professional journey going forward?', 
+                        options: ['Mentorship and career guidance', 'Entrepreneurship support and startup exposure', 'Networking and professional collaborations', 'Advanced learning and upskilling programs', 'Job opportunities and placement support', 'Others (please specify)'], 
+                        hasOtherOption: true, 
+                        otherOptionValue: 'Others (please specify)' 
+                    },
+                    { 
+                        id: 'st_domainLead', 
+                        type: 'radio', 
+                        title: 'Would you like to become a Domain Lead?',
+                        helpText: 'Domain Leads help guide and mentor others in specific areas of expertise.',
+                        options: [
+                            { value: 'yes', label: 'Yes' },
+                            { value: 'no', label: 'No' }
+                        ]
+                    },
+                    { 
+                        id: 'st_guestSpeaker', 
+                        type: 'radio', 
+                        title: 'Would you like to participate as a Guest Speaker?',
+                        helpText: 'Guest Speakers share their knowledge and experiences with the IAC community.',
+                        options: [
+                            { value: 'yes', label: 'Yes' },
+                            { value: 'no', label: 'No' }
+                        ],
+                        // conditionalQuestion: 'st_speaker_topics',
+                        // showWhen: 'yes'
+                    },
+                    { 
+                        id: 'st_stayConnected', 
+                        type: 'select', 
+                        title: 'Would you like to stay connected with IAC and receive updates on upcoming initiatives and collaborations?', 
+                        options: ['Yes - keep me updated via email', 'No - not at the moment'] 
+                    },
+                );
+            } else if (statusLower === 'fresher') {
+                questions.push(
+                        { 
+                        id: 'fr_highlight', 
+                        type: 'textarea', 
+                        title: 'Is there any recent learning experience, project, or achievement you would like to share?',
+                        placeholder: 'Share any recent accomplishments, projects, or learning experiences that you\'re proud of.',
+                        helptext: 'Think about what you learned, experienced, or gained through IAC — it could be a skill, a mindset shift, or a moment that stood out for you.'
+                    },
+                    { 
+                        id: 'fr_iacProgram', 
+                        type: 'chips', 
+                        title: 'Which of the following IAC activities have you been a part of?', 
+                        options: ['1:1 Internship', 'GPI/Internship Program', 'Industry Training', 'Workshops(webinar, expert interactions)', 'Entrepreneurship Programs'],
+                        helpText: 'You may select more than one option',
+                    },
+                    { 
+                        id: 'fr_experience', 
+                        type: 'scale', 
+                        title: 'How would you rate your overall experience while participating in activities on the IAC platform?', 
+                        scale: [1, 2, 3, 4, 5] 
+                    },
+                    { 
+                        id: 'fr_offerings', 
+                        type: 'select', 
+                        title: 'Which of the offerings from IAC supported in your career growth and learning?', 
+                        options: ['1:1 Internship', 'GPI / Internship Program', 'Industry Training', 'Workshops', 'Entrepreneurship Programs', 'Networking & Community Engagement'] 
+                    },
+                    { 
+                        id: 'fr_takeaways', 
+                        type: 'textarea', 
+                        title: 'What did you learn or experience at IAC that really stood out for you?',
+                        placeholder: 'Think about what you learned, experienced, or gained through IAC — it could be a skill, a mindset shift, or a moment that stood out for you.'
+                    },
+                    {   
+                        id: 'fr_recommend', 
+                        type: 'scale', 
+                        title: 'On a scale of 1-10, how likely are you to recommend IAC to a friend or colleague?',  
+                        scale: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                        helpText: '9-10 = Highly likely to recommend, 7-8 = Moderately likely, 1-6 = Unlikely to recommend.'
+                    },
+                    { 
+                        id: 'fr_recommendFor', 
+                        type: 'select', 
+                        title: 'For which of the following mentioned would you recommend IAC to anyone?', 
+                        options: ['For Industry Exposure (Events)', 'For Internship', 'For Jobs', 'For Entrepreneurship', 'Mentorship'] 
+                    },
+                    { 
+                        id: 'fr_missed', 
+                        type: 'textarea', 
+                        title: 'Was there anything we missed?',
+                        placeholder: 'This question\'s response will help us to understand about the improvements we have to make for better user engagement.',
+                        helptext: 'This question response will help us to understand about the improvements we have to make for better user engagement.'
+                    },
+                    { 
+                        id: 'fr_futureOpportunities', 
+                        type: 'select', 
+                        title: 'In pursuing your new career paths, would you return to IAC for support or roles?', 
+                        options: ['Yes - I would definitely consider IAC for future career opportunities', 'No - I do not plan to seek future opportunities through IAC'] 
+                    },
+                    { 
+                        id: 'fr_supportJourney', 
+                        type: 'select', 
+                        title: 'How can IAC best support your professional journey going forward?', 
+                        options: ['Mentorship and career guidance', 'Entrepreneurship support and startup exposure', 'Networking and professional collaborations', 'Advanced learning and upskilling programs', 'Job opportunities and placement support', 'Others (please specify)'], 
+                        hasOtherOption: true, 
+                        otherOptionValue: 'Others (please specify)' 
+                    },
+                    { 
+                        id: 'fr_domainLead', 
+                        type: 'radio', 
+                        title: 'Would you like to become a Domain Lead?',
+                        helpText: 'Domain Leads help guide and mentor others in specific areas of expertise.',
+                        options: [
+                            { value: 'yes', label: 'Yes' },
+                            { value: 'no', label: 'No' }
+                        ]
+                    },
+                    { 
+                        id: 'fr_guestSpeaker', 
+                        type: 'radio', 
+                        title: 'Would you like to participate as a Guest Speaker?',
+                        helpText: 'Guest Speakers share their knowledge and experiences with the IAC community.',
+                        options: [
+                            { value: 'yes', label: 'Yes' },
+                            { value: 'no', label: 'No' }
+                        ],
+                        // conditionalQuestion: 'st_speaker_topics',
+                        // showWhen: 'yes'
+                    },
+                    { 
+                        id: 'fr_stayConnected', 
+                        type: 'select', 
+                        title: 'Would you like to stay connected with IAC and receive updates on upcoming initiatives and collaborations?', 
+                        options: ['Yes - keep me updated via email', 'No - not at the moment'] 
+                    },
+                );
+            } else if (statusLower === 'employed') {
+                questions.push(
+                    { id: 'em_organization', type: 'textarea', title: 'Current Organisation' },
+                    { id: 'em_experienceYears', type: 'select', title: 'How many years of professional experience do you have?', options: ['0-2 years', '3-5 years', '5-10 years', '10+ years'] },
+                    { 
+                        id: 'em_iacProgram', 
+                        type: 'chips', 
+                        title: 'Which of the following IAC activities have you been a part of?', 
+                        options: ['1:1 Internship', 'GPI/Internship Program', 'Industry Training', 'Workshops(webinar, expert interactions)', 'Entrepreneurship Programs'],
+                        helpText: 'You may select more than one option',
+                    },
+                    { 
+                        id: 'em_experience', 
+                        type: 'scale', 
+                        title: 'How would you rate your overall experience while participating in activities on the IAC platform?', 
+                        scale: [1, 2, 3, 4, 5] 
+                    },
+                    { 
+                        id: 'em_offerings', 
+                        type: 'select', 
+                        title: 'Which of the offerings from IAC supported in your career growth and learning?', 
+                        options: ['1:1 Internship', 'GPI / Internship Program', 'Industry Training', 'Workshops', 'Entrepreneurship Programs', 'Networking & Community Engagement'] 
+                    },
+                    { 
+                        id: 'em_takeaways', 
+                        type: 'textarea', 
+                        title: 'What did you learn or experience at IAC that really stood out for you?',
+                        placeholder: 'Think about what you learned, experienced, or gained through IAC — it could be a skill, a mindset shift, or a moment that stood out for you.'
+                    },
+                    {   
+                        id: 'em_recommend', 
+                        type: 'scale', 
+                        title: 'On a scale of 1-10, how likely are you to recommend IAC to a friend or colleague?',  
+                        scale: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                        helpText: '9-10 = Highly likely to recommend, 7-8 = Moderately likely, 1-6 = Unlikely to recommend.'
+                        
+                    },
+                    { 
+                        id: 'em_recommendFor', 
+                        type: 'select', 
+                        title: 'For which of the following mentioned would you recommend IAC to anyone?', 
+                        options: ['For Industry Exposure (Events)', 'For Internship', 'For Jobs', 'For Entrepreneurship', 'Mentorship'] 
+                    },
+                    { 
+                        id: 'em_missed', 
+                        type: 'textarea', 
+                        title: 'Was there anything we missed?',
+                        placeholder: 'This question\'s response will help us to understand about the improvements we have to make for better user engagement.',
+                        helptext: 'This question response will help us to understand about the improvements we have to make for better user engagement.'
+                    },
+                    {
+                        id:'em_motivation',
+                        type: 'chips',
+                        title: 'What is your current professional goal?',
+                        options:['Advancing in my curent role', 'Transition to new role', 'Professional Upskilling', 'Exploring leadership']
+
+                    },
+                    { 
+                        id: 'em_futureOpportunities', 
+                        type: 'select', 
+                        title: 'In pursuing your new career paths, would you return to IAC for support or roles?', 
+                        options: ['Yes - I would definitely consider IAC for future career opportunities', 'No - I do not plan to seek future opportunities through IAC'] 
+                    },
+                    { 
+                        id: 'em_domainLead', 
+                        type: 'radio', 
+                        title: 'Would you like to become a Domain Lead?',
+                        helpText: 'Domain Leads help guide and mentor others in specific areas of expertise.',
+                        options: [
+                            { value: 'yes', label: 'Yes' },
+                            { value: 'no', label: 'No' }
+                        ]
+                    },
+                    { 
+                        id: 'em_guestSpeaker', 
+                        type: 'radio', 
+                        title: 'Would you like to participate as a Guest Speaker?',
+                        helpText: 'Guest Speakers share their knowledge and experiences with the IAC community.',
+                        options: [
+                            { value: 'yes', label: 'Yes' },
+                            { value: 'no', label: 'No' }
+                        ],
+                        // conditionalQuestion: 'st_speaker_topics',
+                        // showWhen: 'yes'
+                    },
+                    { 
+                        id: 'em_jobvacc', 
+                        type: 'radio', 
+                        title: 'Would you be interested in sharing current job vacancies from your organization with the IAC community?',
+                        helpText: 'Referring candidates through your organization may help you earn referral bonuses while supporting IAC members.',
+                        options: [
+                            { value: 'yes', label: 'Yes' },
+                            { value: 'no', label: 'No' }
+                        ],
+                       
+                    },
+                    { 
+                        id: 'em_stayConnected', 
+                        type: 'select', 
+                        title: 'Would you like to stay connected with IAC and receive updates on upcoming initiatives and collaborations?', 
+                        options: ['Yes - keep me updated via email', 'No - not at the moment'] 
+                    },
+                );
+            } else {
+                questions.push(
+                    { id: 'ot_jobSearchDuration', type: 'select', title: 'How long have you been actively seeking an opportunity?', options: ['Less than 3 months', '3-6 months', '6-12 months', '1 year+'] },
+                    { 
+                        id: 'ot_highlight', 
+                        type: 'textarea', 
+                        title: 'Is there any recent learning experience, project, or achievement you would like to share?',
+                        placeholder: 'Share any recent accomplishments, projects, or learning experiences that you\'re proud of.',
+                        helptext: 'Think about what you learned, experienced, or gained through IAC — it could be a skill, a mindset shift, or a moment that stood out for you.'
+                    },
+                    { 
+                        id: 'ot_iacProgram', 
+                        type: 'chips', 
+                        title: 'Which of the following IAC activities have you been a part of?', 
+                        options: ['1:1 Internship', 'GPI/Internship Program', 'Industry Training', 'Workshops(webinar, expert interactions)', 'Entrepreneurship Programs'],
+                        helpText: 'You may select more than one option',
+                    },
+                    { 
+                        id: 'ot_experience', 
+                        type: 'scale', 
+                        title: 'How would you rate your overall experience while participating in activities on the IAC platform?', 
+                        scale: [1, 2, 3, 4, 5] 
+                    },
+                    { 
+                        id: 'ot_offerings', 
+                        type: 'select', 
+                        title: 'Which of the offerings from IAC supported in your career growth and learning?', 
+                        options: ['1:1 Internship', 'GPI / Internship Program', 'Industry Training', 'Workshops', 'Entrepreneurship Programs', 'Networking & Community Engagement'] 
+                    },
+                    { 
+                        id: 'ot_takeaways', 
+                        type: 'textarea', 
+                        title: 'What did you learn or experience at IAC that really stood out for you?',
+                        placeholder: 'Think about what you learned, experienced, or gained through IAC — it could be a skill, a mindset shift, or a moment that stood out for you.'
+                    },
+                    {   
+                        id: 'ot_recommend', 
+                        type: 'scale', 
+                        title: 'On a scale of 1-10, how likely are you to recommend IAC to a friend or colleague?',  
+                        scale: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                        helpText: '9-10 = Highly likely to recommend, 7-8 = Moderately likely, 1-6 = Unlikely to recommend.'
+                        
+                    },
+                    { 
+                        id: 'ot_recommendFor', 
+                        type: 'select', 
+                        title: 'For which of the following mentioned would you recommend IAC to anyone?', 
+                        options: ['For Industry Exposure (Events)', 'For Internship', 'For Jobs', 'For Entrepreneurship', 'Mentorship'] 
+                    },
+                    { 
+                        id: 'ot_missed', 
+                        type: 'textarea', 
+                        title: 'Was there anything we missed?',
+                        placeholder: 'This question\'s response will help us to understand about the improvements we have to make for better user engagement.',
+                        helptext: 'This question response will help us to understand about the improvements we have to make for better user engagement.'
+                    },
+                    {
+                        id:'ot_motivation',
+                        type: 'chips',
+                        title: 'What is your current professional goal?',
+                        options:['Gaining Practical exposure', 'Professional Upskilling','Preparing to re-enter into workforce', 'Exploring career transition']
+
+                    },
+                    { 
+                        id: 'ot_futureOpportunities', 
+                        type: 'select', 
+                        title: 'In pursuing your new career paths, would you return to IAC for support or roles?', 
+                        options: ['Yes - I would definitely consider IAC for future career opportunities', 'No - I do not plan to seek future opportunities through IAC'] 
+                    },
+                    { 
+                        id: 'ot_domainLead', 
+                        type: 'radio', 
+                        title: 'Would you like to become a Domain Lead?',
+                        helpText: 'Domain Leads help guide and mentor others in specific areas of expertise.',
+                        options: [
+                            { value: 'yes', label: 'Yes' },
+                            { value: 'no', label: 'No' }
+                        ]
+                    },
+                    { 
+                        id: 'ot_guestSpeaker', 
+                        type: 'radio', 
+                        title: 'Would you like to participate as a Guest Speaker?',
+                        helpText: 'Guest Speakers share their knowledge and experiences with the IAC community.',
+                        options: [
+                            { value: 'yes', label: 'Yes' },
+                            { value: 'no', label: 'No' }
+                        ],
+                        // conditionalQuestion: 'st_speaker_topics',
+                        // showWhen: 'yes'
+                    },
+                    { 
+                        id: 'ot_stayConnected', 
+                        type: 'select', 
+                        title: 'Would you like to stay connected with IAC and receive updates on upcoming initiatives and collaborations?', 
+                        options: ['Yes - keep me updated via email', 'No - not at the moment'] 
+                    },
+                    
+                );
+                    
+
+            }
+            return questions;
+        }
+        /* ===================================================================
+           BUILD QUESTION ELEMENTS
+           =================================================================== */
+        
+        function buildQuestionElement(q) {
+            const div = document.createElement('div');
+            div.className = 'question';
+            div.id = `q-${q.id}`;
+            let inner = '';
+
+            if (q.type === 'welcome') {
+                inner = `
+                    <div style="text-align: center; padding: 40px 20px;">
+                        <h2 style="margin-bottom: 16px;">${q.title}</h2>
+                        <p class="small-muted" style="margin-bottom: 32px;">${q.help || ''}</p>
+                        <button class="btn" onclick="nextOrSubmit()" style="padding: 12px 32px; font-size: 16px;">
+                            Start Building Your Story
+                        </button>
+                    </div>
+                `;
+            } else {
+                // Question header with tooltip
+                if (q.tooltip) {
+                    inner += `
+                        <div class="question-header">
+                            <label for="${q.id}">${q.title}</label>
+                            <span class="tooltip-icon" data-tooltip="${escapeHtml(q.tooltip)}">?</span>
+                        </div>
+                    `;
+                } else {
+                    inner += `<label for="${q.id}">${q.title}</label>`;
+                }
+                
+                // Help text
+                if (q.helpText) {
+                    inner += `<p class="help-text" style="font-size: 13px; color: #64748b; margin: 8px 0 12px 0;">${escapeHtml(q.helpText)}</p>`;
+                }
+                // Input fields
+                if (q.type === 'input' || q.type === 'email') {
+                    inner += `<input id="${q.id}" type="${q.type === 'email' ? 'email' : 'text'}" placeholder="${q.placeholder || ''}" value="">`;
+                }else if (q.type === 'number') {
+                    inner += `<input id="${q.id}" type="number" min="${q.min || 1}" max="${q.max || 10}" placeholder="${q.placeholder || ''}" value="" style="width: 100%; max-width: 200px; height: 48px; font-size: 16px; text-align: center;">`;
+                } else if (q.type === 'textarea') {
+                    inner += `<textarea id="${q.id}" placeholder="${q.placeholder || ''}"></textarea>`;
+                } else if (q.type === 'select') {
+                    inner += `<select id="${q.id}"><option value="">-- Select an option --</option>${q.options.map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}</select>`;
+                    if (q.hasOtherOption) {
+                        inner += `<div id="${q.id}-other-wrapper" style="display:none; margin-top:10px;"><label for="${q.id}-other-text" style="font-size:13px; color:var(--muted);">Please specify:</label><input type="text" id="${q.id}-other-text" placeholder="Enter your answer..." style="margin-top:4px;"></div>`;
+                    }
+                }else if (q.type === 'chips') {
+                    inner += `<div id="${q.id}-chips" class="chip-grid" role="list">`;
+                    q.options.forEach((opt, idx) => {
+                        inner += `<div class="chip" data-value="${encodeURIComponent(opt)}" id="${q.id}-opt-${idx}">${escapeHtml(opt)}</div>`;
+                    });
+                    inner += `</div><input type="hidden" id="${q.id}" value="">`;
+                } else if (q.type === 'multiselect') {
+                    inner += `
+                        <div class="multiselect-wrapper">
+                            <div class="multiselect-display" id="${q.id}-display" onclick="toggleMultiselectDropdown('${q.id}')">
+                                <span class="multiselect-placeholder">-- Select options --</span>
+                                <span class="multiselect-arrow">▼</span>
+                            </div>
+                            <div class="multiselect-dropdown" id="${q.id}-dropdown" style="display:none;">
+                                ${q.options.map((opt, idx) => `
+                                    <label class="multiselect-option">
+                                        <input type="checkbox" value="${escapeHtml(opt)}" data-parent="${q.id}">
+                                        <span>${escapeHtml(opt)}</span>
+                                    </label>
+                                `).join('')}
+                            </div>
+                            <input type="hidden" id="${q.id}" value="">
+                        </div>
+                    `;
+                } else if (q.type === 'scale') {
+                    inner += `<div class="scale-container"><div class="scale-track">${q.scale.map(n => `<div class="scale-point" data-value="${n}"><div class="scale-dot"></div><span>${n}</span></div>`).join('')}</div><input type="hidden" id="${q.id}" value=""></div>`;
+                } else if (q.type=== 'number') {
+                    inner += `<input id="${q.id}" type="number" min="${q.min || 1}" max="${q.max || 10}" placeholder="${q.placeholder || ''}" value="">`;
+                }else if (q.type === 'radio') {
+                    const hasDescriptions = q.options.some(opt => opt.description);
+                    const horizontalClass = !hasDescriptions || q.horizontal ? ' horizontal' : '';
+                    inner += `<div class="radio-container${horizontalClass}">`;
+                    q.options.forEach((opt, idx) => {
+                        inner += `
+                            <div class="radio-option" data-value="${opt.value}">
+                                <label class="radio-label">
+                                    <input type="radio" name="${q.id}" value="${opt.value}" id="${q.id}-${idx}">
+                                    <span class="radio-custom"></span>
+                                    <strong>${escapeHtml(opt.label)}</strong>
+                                </label>
+                                ${opt.description ? `<p class="radio-description">${escapeHtml(opt.description)}</p>` : ''}
+                            </div>
+                        `;
+                    });
+                    inner += `</div><input type="hidden" id="${q.id}" value="">`;
+                    
+                    // Handle conditional question
+                    if (q.conditionalQuestion) {
+                        const conditionalQ = questions.find(question => question.id === q.conditionalQuestion);
+                        if (conditionalQ && conditionalQ.type === 'textarea') {
+                            inner += `
+                                <div id="${q.conditionalQuestion}-inline-wrapper" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid var(--border-light);">
+                                    <label for="${q.conditionalQuestion}" style="font-weight:600; margin-bottom:8px; display:block;">${conditionalQ.title}</label>
+                                    ${conditionalQ.helpText ? `<p class="help-text" style="font-size: 13px; color: #64748b; margin-bottom: 12px;">${escapeHtml(conditionalQ.helpText)}</p>` : ''}
+                                    <textarea id="${q.conditionalQuestion}" placeholder="${conditionalQ.placeholder || ''}" style="width:100%; min-height:80px;"></textarea>
+                                </div>
+                            `;
+                        }
+                    }
+                }
+            }
+
+            div.innerHTML = inner;
+            return div;
+        }
+
+        function escapeHtml(str) {
+            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        /* ===================================================================
+           STATE PERSISTENCE
+           =================================================================== */
+
+        function saveState() {
+            formState = {};
+            qWrap.querySelectorAll('input, textarea, select').forEach(el => {
+                if (el.id) formState[el.id] = el.value || '';
+            });
+            localStorage.setItem('iacSurvey', JSON.stringify(formState));
+        }
+
+        function restoreState() {
+            if (!formState) return;
+            Object.keys(formState).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.value = formState[id];
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            });
+        }
+
+        /* ===================================================================
+           INTERACTION HANDLERS
+           =================================================================== */
+
+        function renderQuestionsArray() {
+            qWrap.innerHTML = '';
+            questions.forEach(q => qWrap.appendChild(buildQuestionElement(q)));
+            restoreState();
+            attachScaleHandlers();
+            attachRadioHandlers();
+            attachMultiselectHandlers();
+            attachChipHandlers();
+        }
+
+        function attachScaleHandlers() {
+            qWrap.querySelectorAll('.scale-container').forEach(container => {
+                const hidden = container.querySelector('input[type="hidden"]');
+                const points = container.querySelectorAll('.scale-point');
+                points.forEach(point => {
+                    point.onclick = () => {
+                        const value = parseInt(point.dataset.value);
+                        if (hidden) hidden.value = value;
+                        const isNPSScale = points.length > 20; // Check if this is an NPS scale (1-10)
+                        
+                        points.forEach(p => {
+                            const dot = p.querySelector('.scale-dot');
+                            const pValue = parseInt(p.dataset.value);
+                            if (pValue <= value) {
+                                let color;
+                                if (isNPSScale) {
+                                    // Apply NPS colors only for scales with more than 6 points
+                                    if (pValue >= 1 && pValue <= 6) {
+                                        color = '#ef4444'; // Red for detractors (1-6)
+                                    } else if (pValue >= 7 && pValue <= 8) {
+                                        color = '#f97316'; // Orange for passives (7-8)
+                                    } else if (pValue >= 9 && pValue <= 10) {
+                                        color = '#22c55e'; // Green for promoters (9-10)
+                                    } else {
+                                        color = 'var(--primary)'; // Fallback
+                                    }
+                                } else {
+                                    // Use default primary color for regular scales (1-5)
+                                    color = 'var(--primary)';
+                                }
+                                dot.style.background = color;
+                                dot.style.height = '12px';
+                            } else {
+                                dot.style.background = '#eef6ff';
+                                dot.style.height = '8px';
+                            }
+                        });
+                        checkQuestionAnswered();
+                    };
+                });
+            });
+        }
+
+        function attachRadioHandlers() {
+            qWrap.querySelectorAll('.radio-container').forEach(container => {
+                const options = container.querySelectorAll('.radio-option');
+                const hidden = container.parentElement.querySelector('input[type="hidden"]');
+                const questionId = hidden ? hidden.id : '';
+                const question = questions.find(q => q.id === questionId);
+
+                options.forEach(option => {
+                    const radioInput = option.querySelector('input[type="radio"]');
+                    
+                    option.addEventListener('click', function(e) {
+                        if (e.target === radioInput) return;
+                        
+                        const value = option.dataset.value;
+                        const isCurrentlySelected = option.classList.contains('selected');
+                        
+                        if (isCurrentlySelected) {
+                            option.classList.remove('selected');
+                            if (radioInput) radioInput.checked = false;
+                            if (hidden) hidden.value = '';
+                            hideConditional();
+                        } else {
+                            selectOption(option, value, radioInput);
+                        }
+                        
+                        checkQuestionAnswered();
+                    });
+                    
+                    if (radioInput) {
+                        radioInput.addEventListener('change', function() {
+                            if (this.checked) {
+                                const value = option.dataset.value;
+                                selectOption(option, value, radioInput);
+                                checkQuestionAnswered();
+                            }
+                        });
+                    }
+                });
+                
+                function selectOption(option, value, radioInput) {
+                    options.forEach(opt => {
+                        opt.classList.remove('selected');
+                        const optRadio = opt.querySelector('input[type="radio"]');
+                        if (optRadio && optRadio !== radioInput) optRadio.checked = false;
+                    });
+                    
+                    option.classList.add('selected');
+                    if (radioInput) radioInput.checked = true;
+                    if (hidden) hidden.value = value;
+                    
+                    showConditional(value);
+                }
+                
+                function hideConditional() {
+                    if (question?.conditionalQuestion) {
+                        const conditionalWrapper = document.getElementById(`${question.conditionalQuestion}-inline-wrapper`);
+                        if (conditionalWrapper) {
+                            conditionalWrapper.style.display = 'none';
+                            const conditionalInput = document.getElementById(question.conditionalQuestion);
+                            if (conditionalInput) conditionalInput.value = '';
+                        }
+                    }
+                }
+                
+                function showConditional(value) {
+                    if (question?.conditionalQuestion) {
+                        const conditionalWrapper = document.getElementById(`${question.conditionalQuestion}-inline-wrapper`);
+                        if (conditionalWrapper) {
+                            if (value === question.showWhen) {
+                                setTimeout(() => {
+                                    conditionalWrapper.style.display = 'block';
+                                }, 10);
+                            } else {
+                                conditionalWrapper.style.display = 'none';
+                                const conditionalInput = document.getElementById(question.conditionalQuestion);
+                                if (conditionalInput) conditionalInput.value = '';
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function attachChipHandlers() {
+            qWrap.querySelectorAll('.chip-grid').forEach(grid => {
+                const chips = grid.querySelectorAll('.chip');
+                const hiddenInput = grid.nextElementSibling;
+                
+                // Remove any existing click listeners by cloning
+                chips.forEach(chip => {
+                    const newChip = chip.cloneNode(true);
+                    chip.parentNode.replaceChild(newChip, chip);
+                });
+                
+                // Reselect after cloning
+                const newChips = grid.querySelectorAll('.chip');
+                
+                newChips.forEach(chip => {
+                    chip.addEventListener('click', function() {
+                        this.classList.toggle('selected');
+                        const selected = Array.from(grid.querySelectorAll('.chip.selected'))
+                            .map(c => decodeURIComponent(c.dataset.value));
+                        
+                        if (hiddenInput && hiddenInput.type === 'hidden') {
+                            hiddenInput.value = selected.join(', ');
+                        }
+                        
+                        checkQuestionAnswered();
+                    });
+                });
+            });
+        }
+
+        /* ===================================================================
+           NAVIGATION & PROGRESS
+           =================================================================== */
+        
+        
+
+        function updateProgress() {
+            const visibleQuestions = questions.filter(q => !q.hidden);
+            const currentVisibleIndex = questions.slice(0, current + 1).filter(q => !q.hidden).length - 1;
+            const percentage = Math.round((currentVisibleIndex / Math.max(1, visibleQuestions.length - 1)) * 100);
+            gsap.to(progressBar, { width: percentage + '%', duration: 0.4 });
+        }
+
+        function updateControls() {
+            const currQ = questions[current];
+            const controlsDiv = document.querySelector('.controls');
+            // Hide controls on welcome page
+            if (currQ && currQ.type === 'welcome') {
+                controlsDiv.style.display = 'none';
+                return;
+            } else {
+                controlsDiv.style.display = 'flex';
+            }
+            // prevBtn.disabled = (current <= 1);
+            prevBtn.disabled = current === 0;
+            if (current === questions.length - 1) {
+                nextBtn.textContent = 'Submit';
+                nextBtn.setAttribute('aria-label', 'Submit');
+            } else {
+                nextBtn.textContent = 'Next →';
+                nextBtn.setAttribute('aria-label', 'Next');
+            }
+        }
+
+        function showQuestion(idx) {
+            document.querySelectorAll('.question').forEach(el => el.classList.remove('active'));
+            const el = document.getElementById(`q-${questions[idx].id}`);
+            if (!el) return;
+
+            el.classList.add('active');
+            gsap.fromTo(el, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.45 });
+
+            current = idx;
+            updateControls();
+            updateProgress();
+            checkQuestionAnswered();
+
+            setTimeout(() => {
+                const firstInput = el.querySelector('input, textarea, select');
+                if (firstInput && typeof firstInput.focus === 'function') firstInput.focus();
+                
+                el.querySelectorAll('input, textarea, select').forEach(input => {
+                    input.addEventListener('input', checkQuestionAnswered);
+                    input.addEventListener('change', checkQuestionAnswered);
+                });
+
+                const currQ = questions[idx];
+                if (currQ.hasOtherOption) {
+                    const selectEl = document.getElementById(currQ.id);
+                    const otherWrapper = document.getElementById(`${currQ.id}-other-wrapper`);
+                    const otherInput = document.getElementById(`${currQ.id}-other-text`);
+                    
+                    if (selectEl && otherWrapper && otherInput) {
+                        selectEl.addEventListener('change', function() {
+                            if (this.value === currQ.otherOptionValue) {
+                                otherWrapper.style.display = 'block';
+                                otherInput.focus();
+                            } else {
+                                otherWrapper.style.display = 'none';
+                                otherInput.value = '';
+                            }
+                        });
+                        if (selectEl.value === currQ.otherOptionValue) otherWrapper.style.display = 'block';
+                        }
+                    }
+                    if (currQ.type === 'multiselect') {
+                        const selectEl = document.getElementById(currQ.id);
+                        selectEl.addEventListener('change', function() {
+                            const selected = Array.from(this.selectedOptions).map(opt => opt.value).filter(v => v);
+                            this.value = selected.join(', ');
+                            checkQuestionAnswered();
+                        });
+                    }
+            }, 250);
+            attachChipHandlers();
+        }
+
+        function checkQuestionAnswered() {
+            const currQ = questions[current];
+            if (!currQ || currQ.type === 'welcome') {
+                nextBtn.classList.remove('answer-pending');
+                return;
+            }
+            const currEl = document.getElementById(currQ.id);
+            if (!currEl) return;
+            const value = (currEl.value || '').trim();
+            if (value && value !== '') {
+                nextBtn.classList.remove('answer-pending');
+            } else {
+                nextBtn.classList.add('answer-pending');
+            }
+        }
+
+        function nextOrSubmit() {
+            const currQ = questions[current];
+            
+            // Skip validation on welcome page
+            if (currQ && currQ.type === 'welcome') {
+                current = current + 1;
+                showQuestion(current);
+                return;
+            }
+
+            // **ADD THIS VALIDATION BLOCK HERE** - Validate name field
+            if (currQ && currQ.id === 'name') {
+                const nameEl = document.getElementById('name');
+                if (!nameEl || !nameEl.value.trim()) {
+                    alert('Please enter your name.');
+                    return;
+                }
+            }
+            
+            // **ADD THIS VALIDATION BLOCK HERE** - Validate email field
+            if (currQ && currQ.id === 'email') {
+                const emailEl = document.getElementById('email');
+                if (!emailEl || !emailEl.value.trim()) {
+                    alert('Please enter your email.');
+                    return;
+                }
+                if (!validateEmail(emailEl.value.trim())) {
+                    alert('Please enter a valid email address.');
+                    return;
+                }
+            }
+            
+            // for the 1-10 review field
+            if (currQ && currQ.type === 'number') {
+                const el = document.getElementById(currQ.id);
+                const value = el ? parseFloat(el.value) : NaN;
+                const min = currQ.min || 1;
+                const max = currQ.max || 10;
+                
+                if (!el.value.trim()) {
+                    alert('Please enter a rating.');
+                    return;
+                }
+                if (isNaN(value) || value < min || value > max) {
+                    alert('Please enter a number between ' + min + ' and ' + max + '.');
+                    return;
+                }
+                if (!Number.isInteger(value)) {
+                    alert('Please enter a whole number.');
+                    return;
+                }
+            }
+            
+            // Mandatory status field
+            if (currQ && currQ.id === 'status') {
+                const statusEl = document.getElementById('status');
+                if (!statusEl || !statusEl.value || statusEl.value.trim() === '') {
+                    alert('Please select your current status to continue.');
+                    return;
+                }
+                
+                // Reset if coming back to status question
+                if (statusInjected) {
+                    statusInjected = false;
+                    questions = initialQuestions.slice();
+                    renderQuestionsArray();
+                }
+                
+                // Inject persona questions
+                saveState();
+                const selectedStatus = statusEl.value;
+                const personaQs = getStatusQuestions(selectedStatus);
+                const before = questions.slice(0, current + 1);
+                questions = before.concat(personaQs);
+                statusInjected = true;
+                localStorage.removeItem('iacSurvey');
+                renderQuestionsArray();
+                setTimeout(() => {
+                    showQuestion(current + 1);
+                }, 100);
+                return;
+            }
+            
+            let nextIdx = current + 1;
+            while (nextIdx < questions.length && questions[nextIdx].hidden) {
+                nextIdx++;
+            }
+            if (nextIdx < questions.length) {
+                showQuestion(nextIdx);
+            } else {
+                submitData();
+            }
+        }
+        function prev() {
+            let prevIdx = current - 1;
+            while (prevIdx >= 0 && questions[prevIdx].hidden) {
+                prevIdx--;
+            }
+            if (prevIdx >= 0) {
+                showQuestion(prevIdx);
+            }
+        }
+
+        /* ===================================================================
+           FORM SUBMISSION
+           =================================================================== */
+
+        function collectValues() {
+            const data = {};
+            questions.forEach(q => {
+                if (q.type === 'welcome') return;
+                const el = document.getElementById(q.id);
+                if (q.hasOtherOption && el && el.value === q.otherOptionValue) {
+                    const otherText = document.getElementById(`${q.id}-other-text`);
+                    data[q.id] = otherText ? `${el.value}: ${otherText.value.trim()}` : el.value;
+                } else {
+                    data[q.id] = el ? el.value.trim() : '';
+                }
+            });
+
+            const status = (data.status || '');
+            const statusDetails = {};
+            const statusLower = status.toLowerCase();
+
+            // Student data
+            if (statusLower === 'student'){
+                statusDetails.highlight = data.st_highlight || '';
+                statusDetails.iacProgram = data.st_iacProgram || '';
+                statusDetails.experience = data.st_experience || '';
+                statusDetails.offerings = data.st_offerings || ''; 
+                statusDetails.takeaways = data.st_takeaways || '';
+                statusDetails.recommend = data.st_recommend || '';
+                statusDetails.recommendFor = data.st_recommendFor || '';
+                statusDetails.missed = data.st_missed || '';
+                statusDetails.futureOpportunities = data.st_futureOpportunities || '';
+                statusDetails.supportJourney = data.st_supportJourney || '';
+                statusDetails.domainLead = data.st_domainLead || '';   
+                statusDetails.guestSpeaker = data.st_guestSpeaker || '';
+                statusDetails.stayConnected = data.st_stayConnected || '';
+            } else if (statusLower === 'fresher'){
+                statusDetails.highlight = data.fr_highlight || '';
+                statusDetails.iacProgram = data.fr_iacProgram || '';
+                statusDetails.experience = data.fr_experience || '';
+                statusDetails.offerings = data.fr_offerings || '';
+                statusDetails.takeaways = data.fr_takeaways || '';
+                statusDetails.recommend = data.fr_recommend || '';
+                statusDetails.recommendFor = data.fr_recommendFor || '';
+                statusDetails.missed = data.fr_missed || '';
+                statusDetails.futureOpportunities = data.fr_futureOpportunities || '';
+                statusDetails.supportJourney = data.fr_supportJourney || '';
+                statusDetails.domainLead = data.fr_domainLead || '';   
+                statusDetails.guestSpeaker = data.fr_guestSpeaker || '';
+                statusDetails.stayConnected = data.fr_stayConnected || '';
+            } else if (statusLower === 'employed') {
+                statusDetails.organization = data.em_organization || '';
+                statusDetails.experienceYears = data.em_experienceYears || '';
+                statusDetails.iacProgram = data.em_iacProgram || '';
+                statusDetails.experience = data.em_experience || '';
+                statusDetails.offerings = data.em_offerings || '';
+                statusDetails.takeaways = data.em_takeaways || '';
+                statusDetails.recommend = data.em_recommend || '';
+                statusDetails.recommendFor = data.em_recommendFor || '';
+                statusDetails.missed = data.em_missed || '';
+                statusDetails.motivation = data.em_motivation || '';
+                statusDetails.futureOpportunities = data.em_futureOpportunities || '';  
+                statusDetails.domainLead = data.em_domainLead || '';   
+                statusDetails.guestSpeaker = data.em_guestSpeaker || '';
+                statusDetails.jobvaccancies = data.em_jobvacc || '';
+                statusDetails.stayConnected = data.em_stayConnected || '';
+            } else {
+                statusDetails.jobSearchDuration = data.ot_jobSearchDuration || '';
+                statusDetails.iacProgram = data.ot_iacProgram || '';
+                statusDetails.experience = data.ot_experience || '';
+                statusDetails.offerings = data.ot_offerings || '';
+                statusDetails.takeaways = data.ot_takeaways || '';
+                statusDetails.recommend = data.ot_recommend || '';
+                statusDetails.recommendFor = data.ot_recommendFor || '';
+                statusDetails.missed = data.ot_missed || '';
+                statusDetails.motivation = data.ot_motivation || '';
+                statusDetails.futureOpportunities = data.ot_futureOpportunities || '';
+                statusDetails.domainLead = data.ot_domainLead || '';   
+                statusDetails.guestSpeaker = data.ot_guestSpeaker || '';
+                statusDetails.stayConnected = data.ot_stayConnected || '';
+            }
+                    
+
+            return { 
+                name: data.name || '', 
+                email: data.email || '', 
+                status: data.status || '', 
+                statusDetails: statusDetails 
+            };
+        }
+
+        function validateEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+
+        function submitData() {
+            nextBtn.disabled = true;
+            prevBtn.disabled = true;
+            const payload = collectValues();
+
+            if (!payload.name) {
+                alert('Please enter your name.');
+                nextBtn.disabled = false;
+                prevBtn.disabled = false;
+                return;
+            }
+            if (payload.email && !validateEmail(payload.email)) {
+                alert('Please enter a valid email');
+                nextBtn.disabled = false;
+                prevBtn.disabled = false;
+                return;
+            }
+            
+            console.log('Submitting payload:', payload);
+            
+            fetch(CONFIG.API_URL, {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                return response.text(); // Get as text first to see raw response
+            })
+            .then(text => {
+                console.log('Raw response text (first 500 chars):', text.substring(0, 500));
+                
+                // Try to parse as JSON
+                let serverResult;
+                try {
+                    serverResult = JSON.parse(text);
+                } catch (e) {
+                    console.error('Failed to parse JSON:', e);
+                    console.error('Full response text:', text);
+                    throw new Error('Invalid JSON response from server');
+                }
+                
+                console.log('Parsed serverResult:', serverResult);
+                console.log('serverResult.id:', serverResult.id);
+                console.log('serverResult.certificateHtml exists:', !!serverResult.certificateHtml);
+                console.log('serverResult.certificateHtml length:', serverResult.certificateHtml ? serverResult.certificateHtml.length : 'N/A');
+                console.log('serverResult.certificateHtml type:', typeof serverResult.certificateHtml);
+                
+                if (!serverResult.certificateHtml) {
+                    console.error('Certificate HTML is missing from response!');
+                    console.error('Full serverResult object:', JSON.stringify(serverResult));
+                    alert('Error: Certificate not generated. Please check console for details.');
+                    nextBtn.disabled = false;
+                    prevBtn.disabled = false;
+                    return;
+                }
+                
+                lastServerResult = serverResult;
+                showThankYouAndCertificate(serverResult.certificateHtml);
+            })
+            .catch(err => {
+                console.error('Fetch error:', err);
+                alert('Submission error: ' + err.message);
+                nextBtn.disabled = false;
+                prevBtn.disabled = false;
+            });
+        }
+        /* ===================================================================
+           THANK YOU & CERTIFICATE
+           =================================================================== */
+
+        // function showThankYouAndCertificate(certificateHtml) {
+        //     qWrap.style.display = 'none';
+        //     document.querySelector('.controls').style.display = 'none';
+        //     document.querySelector('.footer-text').style.display = 'none';
+        //     document.getElementById('thankyou').style.display = 'block';
+
+        //     const tmBtn = document.getElementById('tagMangoBtn');
+        //     const waBtn = document.getElementById('whatsappBtn');
+        //     if (tmBtn) tmBtn.href = TAGMANGO_URL;
+        //     if (waBtn) waBtn.href = WHATSAPP_URL;
+
+        //     const userName = document.getElementById('name') ? document.getElementById('name').value : '';
+        //     const firstName = userName ? userName.split(' ')[0] : '';
+        //     // document.getElementById('thanksTitle').innerText = `🎉 Thank you${firstName ? ', ' + firstName : ''}!`;
+        //     document.getElementById('thanksTitle').innerText = '🎉 Thank you' + (firstName ? ', ' + firstName : '') + '!';
+
+        //     const certWrap = document.getElementById('certificateWrap');
+        //     certWrap.innerHTML = String(certificateHtml);
+
+        //     addDownloadButtons();
+        //     gsap.from('#thankyou', { opacity: 0, scale: 0.98, duration: 0.5, ease: 'back.out(1.2)' });
+        // }
+        function showThankYouAndCertificate(certificateHtml) {
+            console.log('showThankYouAndCertificate called with:', {
+                type: typeof certificateHtml,
+                length: certificateHtml ? certificateHtml.length : 'N/A',
+                isUndefined: certificateHtml === undefined,
+                value: certificateHtml ? certificateHtml.substring(0, 100) : certificateHtml
+            });
+            
+            qWrap.style.display = 'none';
+            document.querySelector('.controls').style.display = 'none';
+            document.querySelector('.footer-text').style.display = 'none';
+            document.getElementById('thankyou').style.display = 'block';
+
+            const tmBtn = document.getElementById('tagMangoBtn');
+            const waBtn = document.getElementById('whatsappBtn');
+            if (tmBtn) tmBtn.href = TAGMANGO_URL;
+            if (waBtn) waBtn.href = WHATSAPP_URL;
+
+            const userName = document.getElementById('name') ? document.getElementById('name').value : '';
+            const firstName = userName ? userName.split(' ')[0] : '';
+            document.getElementById('thanksTitle').innerText = '🎉 Thank you' + (firstName ? ', ' + firstName : '') + '!';
+
+            const certWrap = document.getElementById('certificateWrap');
+            
+            // Handle undefined or empty certificate
+            if (!certificateHtml || certificateHtml === 'undefined') {
+                console.error('Certificate HTML is undefined or invalid!');
+                certWrap.innerHTML = '<div style="padding:20px;text-align:center;color:#ef4444;">Error: Certificate could not be generated. Please contact support.</div>';
+                return;
+            }
+            
+            certWrap.innerHTML = certificateHtml;
+
+            addDownloadButtons();
+            gsap.from('#thankyou', { opacity: 0, scale: 0.98, duration: 0.5, ease: 'back.out(1.2)' });
+        }
+
+        function addDownloadButtons() {
+            const btnWrap = document.getElementById('certButtons');
+            btnWrap.innerHTML = '';
+            const jpgBtn = document.createElement('button');
+            jpgBtn.className = 'btn ghost';
+            jpgBtn.textContent = 'Download .jpg';
+            jpgBtn.style.cssText = 'flex:1; background:#e2e8f0; color:#475569; border-color:#cbd5e1;';
+            jpgBtn.onclick = () => downloadCertificateImage('jpg');
+            const pdfBtn = document.createElement('button');
+            pdfBtn.className = 'btn';
+            pdfBtn.textContent = 'Download .pdf';
+            pdfBtn.style.cssText = 'flex:1; background:#e2e8f0; color:#475569; border-color:#cbd5e1;';
+            pdfBtn.onclick = () => downloadCertificatePdf();
+            btnWrap.appendChild(jpgBtn);
+            btnWrap.appendChild(pdfBtn);
+        }
+
+        function downloadCertificateImage(type = 'jpg') {
+            const certificateEl = document.getElementById('certificateCard-server') || document.getElementById('certificateCard');
+            if (!certificateEl) { alert('Certificate not found.'); return; }
+            
+            // Show loading overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;';
+            overlay.innerHTML = '<div style="background:white;padding:24px 32px;border-radius:12px;font-size:16px;color:#1e293b;">Preparing download...</div>';
+            document.body.appendChild(overlay);
+            
+            // Clone certificate for off-screen rendering
+            const clone = certificateEl.cloneNode(true);
+            clone.style.cssText = 'position:absolute;left:-9999px;width:900px;max-width:900px;';
+            document.body.appendChild(clone);
+            
+            setTimeout(() => {
+                html2canvas(clone, { 
+                    scale: 3,
+                    useCORS: true, 
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    windowWidth: 1200,
+                    width: 900
+                }).then(canvas => {
+                    document.body.removeChild(clone);
+                    document.body.removeChild(overlay);
+                    
+                    canvas.toBlob(blob => {
+                        const a = document.createElement('a');
+                        a.href = URL.createObjectURL(blob);
+                        a.download = 'iac_certificate_' + Date.now() + '.' + (type === 'jpg' ? 'jpg' : 'png');
+                        a.click();
+                        URL.revokeObjectURL(a.href);
+                    }, type === 'jpg' ? 'image/jpeg' : 'image/png', 0.95);
+                }).catch(e => {
+                    document.body.removeChild(clone);
+                    document.body.removeChild(overlay);
+                    alert('Error generating image: ' + e);
+                });
+            }, 100);
+        }
+
+        async function downloadCertificatePdf() {
+            const certificateEl = document.getElementById('certificateCard-server') || document.getElementById('certificateCard');
+            if (!certificateEl) { alert('Certificate not found.'); return; }
+            
+            // Show loading overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;';
+            overlay.innerHTML = '<div style="background:white;padding:24px 32px;border-radius:12px;font-size:16px;color:#1e293b;">Preparing download...</div>';
+            document.body.appendChild(overlay);
+            
+            // Clone certificate for off-screen rendering
+            const clone = certificateEl.cloneNode(true);
+            clone.style.cssText = 'position:absolute;left:-9999px;width:900px;max-width:900px;';
+            document.body.appendChild(clone);
+            
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            try {
+                const canvas = await html2canvas(clone, { 
+                    scale: 3,
+                    useCORS: true, 
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    windowWidth: 1200,
+                    width: 900
+                });
+                
+                document.body.removeChild(clone);
+                document.body.removeChild(overlay);
+                
+                const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                const { jsPDF } = window.jspdf;
+                
+                const pdfWidth = canvas.width;
+                const pdfHeight = canvas.height;
+                
+                const pdf = new jsPDF({ 
+                    orientation: pdfWidth > pdfHeight ? 'landscape' : 'portrait', 
+                    unit: 'pt', 
+                    format: [pdfWidth, pdfHeight]
+                });
+                
+                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save('iac_certificate_' + Date.now() + '.pdf');
+            } catch(e) {
+                if (document.body.contains(clone)) document.body.removeChild(clone);
+                if (document.body.contains(overlay)) document.body.removeChild(overlay);
+                alert('Error generating PDF: ' + e);
+            }
+        }
+
+        /* ===================================================================
+           UTILITY FUNCTIONS
+           =================================================================== */
+
+        function toggleInfoPanel() {
+            const panel = document.getElementById('infoPanel');
+            if (panel) panel.classList.toggle('show');
+        }
+
+        function setupInfoPanelClose() {
+            const infoWrapper = document.querySelector('.info-wrapper');
+            const infoPanel = document.getElementById('infoPanel');
+            if (!infoWrapper || !infoPanel) return;
+            
+            document.addEventListener('click', function(event) {
+                if (!infoWrapper.contains(event.target)) infoPanel.classList.remove('show');
+            });
+            
+            infoPanel.addEventListener('click', function(event) {
+                event.stopPropagation();
+            });
+            
+            const infoButton = document.querySelector('.info-button');
+            if (infoButton) {
+                infoButton.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                });
+            }
+        }
+
+        window.prev = prev;
+        window.nextOrSubmit = nextOrSubmit;
+        window.next = nextOrSubmit;
+        window.toggleInfoPanel = toggleInfoPanel;
+
+        function toggleMultiselectDropdown(id) {
+            const dropdown = document.getElementById(`${id}-dropdown`);
+            const display = document.getElementById(`${id}-display`);
+            const isVisible = dropdown.style.display === 'block';
+            
+            // Close all dropdowns
+            document.querySelectorAll('.multiselect-dropdown').forEach(d => {
+                d.style.display = 'none';
+                d.style.top = '';
+                d.style.bottom = '';
+            });
+            
+            // // Toggle current
+            // dropdown.style.display = isVisible ? 'none' : 'block';
+            if (!isVisible) {
+                // Check if there's enough space below
+                const rect = display.getBoundingClientRect();
+                const spaceBelow = window.innerHeight - rect.bottom;
+                const dropdownHeight = 250; // max-height from CSS
+                
+                if (spaceBelow < dropdownHeight && rect.top > dropdownHeight) {
+                    // Open upwards
+                    dropdown.style.top = 'auto';
+                    dropdown.style.bottom = 'calc(100% + 4px)';
+                } else {
+                    // Open downwards (default)
+                    dropdown.style.top = 'calc(100% + 4px)';
+                    dropdown.style.bottom = 'auto';
+                }
+                
+                dropdown.style.display = 'block';
+            }
+            
+            event.stopPropagation();
+        }
+
+        function attachMultiselectHandlers() {
+            qWrap.querySelectorAll('.multiselect-dropdown').forEach(dropdown => {
+                const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]');
+                
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        const parentId = this.dataset.parent;
+                        const hidden = document.getElementById(parentId);
+                        const display = document.getElementById(`${parentId}-display`);
+                        const placeholder = display.querySelector('.multiselect-placeholder');
+                        
+                        const selected = Array.from(dropdown.querySelectorAll('input[type="checkbox"]:checked'))
+                            .map(cb => cb.value);
+                        
+                        if (hidden) hidden.value = selected.join(', ');
+                        
+                        if (selected.length === 0) {
+                            placeholder.textContent = '-- Select options --';
+                            placeholder.style.color = '#94a3b8';
+                        } else if (selected.length === 1) {
+                            placeholder.textContent = selected[0];
+                            placeholder.style.color = '#1e293b';
+                        } else {
+                            placeholder.textContent = `${selected.length} options selected`;
+                            placeholder.style.color = '#1e293b';
+                        }
+                        
+                        checkQuestionAnswered();
+                    });
+                });
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.multiselect-wrapper')) {
+                    document.querySelectorAll('.multiselect-dropdown').forEach(d => d.style.display = 'none');
+                }
+            });
+        }
+
+        window.toggleMultiselectDropdown = toggleMultiselectDropdown;
+
+        /* ===================================================================
+           INITIALIZATION
+           =================================================================== */
+
+        function initFlow() {
+            const savedState = localStorage.getItem('iacSurvey');
+            if (savedState) formState = JSON.parse(savedState);
+            
+            questions = initialQuestions.slice();
+            renderQuestionsArray();
+            showQuestion(0);
+            updateControls();
+
+            const tmBtn = document.getElementById('tagMangoBtn');
+            const waBtn = document.getElementById('whatsappBtn');
+            if (tmBtn) tmBtn.href = TAGMANGO_URL;
+            if (waBtn) waBtn.href = WHATSAPP_URL;
+
+            setupInfoPanelClose();
+        }
+        
+        initFlow();
+    </script>
+</body>
+</html>
