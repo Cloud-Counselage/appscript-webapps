@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IAC Certificate Verification</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      margin: 0;
+      padding: 40px 20px;
+      min-height: 100vh;
+      background: linear-gradient(
+        135deg,
+        #273755 0%,
+        #273755 44%,
+        #FEC601 44%,
+        #FEC601 62%,
+        #EA7317 62%,
+        #EA7317 78%,
+        #3DA5D9 78%,
+        #3DA5D9 100%
+      );
+    }
+
+    .container {
+      max-width: 1050px;
+      margin: auto;
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 25px 60px rgba(39,55,85,0.25);
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      height: 65px;
+      object-fit: contain;
+    }
+
+    h2 {
+      text-align: center;
+      color: #273755;
+      margin-bottom: 25px;
+      font-weight: bold;
+    }
+
+    .info-box, .steps-box, .benefits-box {
+      padding: 18px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .info-box {
+      background: #f9fafb;
+      border-left: 5px solid #3DA5D9;
+    }
+
+    .steps-box {
+      background: #fffdf2;
+      border-left: 5px solid #FEC601;
+    }
+
+    .benefits-box {
+      background: #f4faff;
+      border-left: 5px solid #273755;
+      margin-bottom: 30px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1.5px solid #e5e7eb;
+      background: #f9fafb;
+      font-size: 14px;
+      font-family: "Times New Roman", Times, serif;
+      transition: 0.3s;
+    }
+
+    ::placeholder {
+      font-family: "Times New Roman", Times, serif;
+      color: #475569;
+      opacity: 1;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #3DA5D9;
+      box-shadow: 0 0 0 4px rgba(61,165,217,0.25);
+      background: #fff;
+    }
+
+    .cert-card {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 12px 30px rgba(39,55,85,0.08);
+    }
+
+    .pledge-card {
+      border: 2px solid #FEC601;
+      background: #fffdf2;
+      box-shadow: 0 15px 45px rgba(254,198,1,0.25);
+    }
+
+    .cert-header {
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #273755;
+    }
+
+    button {
+      background: #273755;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-family: "Times New Roman", Times, serif;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1c2a44;
+    }
+
+    .submit-btn {
+      width: 100%;
+      height: 55px;
+      margin-top: 30px;
+      font-size: 16px;
+      font-family: "Times New Roman", Times, serif;
+      background: #EA7317;
+    }
+
+    .submit-btn:hover {
+      background: #d66112;
+    }
+
+    #successScreen {
+      display: none;
+      min-height: 100vh;
+      justify-content: center;
+      align-items: center;
+      background: #273755;
+      color: white;
+      font-size: 20px;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .success-box {
+      background: white;
+      color: #273755;
+      padding: 60px;
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+
+    .success-wrapper{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:30px;
+    }
+
+    .promotion-box{
+      background:white;
+      padding:35px;
+      border-radius:20px;
+      width:850px;
+      max-width:90%;
+      box-shadow:0 20px 45px rgba(0,0,0,0.18);
+      text-align:center;
+    }
+
+    .promotion-box h3{
+      color:#273755;
+      font-size:24px;
+      font-weight:700;
+      border-bottom:2px solid #EA7317;
+      display:inline-block;
+      padding-bottom:6px;
+    }
+
+    .promotion-box p{
+      color:#374151;
+      font-size:15px;
+      line-height:1.6;
+      max-width:650px;
+      margin:auto;
+    }
+
+    .promo-cards{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:25px;
+      margin-top:25px;
+    }
+
+    .promo-card {
+      background:#f9fafb;
+      padding:22px;
+      border-radius:14px;
+      border:1px solid #e5e7eb;
+      transition:0.3s;
+    }
+
+    .promo-card:hover{
+      transform:translateY(-4px);
+      box-shadow:0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .promo-card h4{
+      color:#273755 !important;
+      font-weight:600;
+      font-size:18px;
+    }
+
+    .promo-card a{
+      display:inline-block;
+      margin-top:12px;
+      padding:10px 18px;
+      background:#EA7317;
+      color:white;
+      text-decoration:none;
+      border-radius:8px;
+      font-size:14px;
+    }
+
+    .promo-card a:hover{
+      background:#d66112;
+    }
+
+    .guide-description{
+      font-size:15px;
+      color:#000000;
+      line-height:1.6;
+    }
+
+    .verification-conditions summary{
+      font-size:15px;
+      font-weight:600;
+      color:#1e293b;
+      cursor:pointer;
+    }
+
+    .verification-conditions ul{
+      font-size:14.5px;
+      line-height:1.7;
+      margin-top:8px;
+      color:#000000;
+    }
+
+    .section-title{
+      font-size:18px;
+      font-weight:700;
+      color:#273755;
+      margin-bottom:10px;
+    }
+
+    .benefit-list{
+      padding-left:20px;
+      margin-bottom:15px;
+    }
+
+    .benefit-list li{
+      margin-bottom:6px;
+    }
+
+    .highlight-box{
+      background:#ffffff;
+      border:1px solid #e2e8f0;
+      padding:16px;
+      border-radius:12px;
+      margin-top:15px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.05);
+    }
+
+    .highlight-box p{
+      margin-top:6px;
+      font-size:14.5px;
+      color:#374151;
+      line-height:1.6;
+    }
+
+    .note-box{
+      margin-top:12px;
+      font-size:14px;
+      color:#92400e;
+      background:#fff7ed;
+      padding:10px 12px;
+      border-radius:8px;
+      border:1px solid #fed7aa;
+    }
+
+    #formContainer.loading {
+      filter: blur(4px);
+      pointer-events: none;
+    }
+
+    #loaderOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.6);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #ccc;
+      border-top: 4px solid #4CAF50;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      width: 300px;
+      max-width: 100%;
+    }
+
+    .gpi-toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #ccc;
+      border-radius: 34px;
+      transition: 0.3s;
+    }
+
+    .slider:before {
+      content: "";
+      position: absolute;
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+
+    input:checked + .slider {
+      background-color: #4CAF50;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    .gpi-field {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid #ccc;
+      padding: 10px 12px;
+      border-radius: 8px;
+      height: 45px;
+      background: #fff;
+    }
+
+    .switch.small {
+      width: 40px;
+      height: 22px;
+      flex: 0 0 auto;
+    }
+
+    .switch.small .slider:before {
+      height: 16px;
+      width: 16px;
+      transform: translateX(0px);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(18px);
+    }
+
+    .gpi-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    #gpiText {
+      font-size: 14px;
+      color: #555;
+      white-space: nowrap;
+    }
+
+    #internId {
+      display: none;
+      border: none;
+      outline: none;
+      border-left: 1px solid #ddd;
+      padding-left: 10px;
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+    }
+
+    .status-box{
+      display:none;
+      margin-top:-10px;
+      margin-bottom:20px;
+      padding:12px 14px;
+      border-radius:10px;
+      border:1px solid #dbeafe;
+      background:#f8fafc;
+      color:#1e293b;
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      max-width: 320px;
+      aspect-ratio: 16 / 9;
+      margin-top: 12px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    .video-container iframe {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: none;
+      top: 0;
+      left: 0;
+    }
+
+    @media (max-width: 900px) {
+      .field-row, .promo-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .container {
+        padding: 22px;
+      }
+
+      .success-box {
+        padding: 30px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container" id="formContainer">
+    <div class="top-row">
+      <img class="logo" src="https://drive.google.com/thumbnail?id=1Y4gruQZD5gtX-GVB6aZ2poorv9oG6Ez8" alt="Logo 1">
+      <img class="logo" src="https://drive.google.com/thumbnail?id=1mmugbHg8QETtsBj2CigBq7RzKwsjKQNK" alt="Logo 2">
+      <img class="logo" src="https://drive.google.com/thumbnail?id=1GPqAwys9LdaNHp5ovY4bLsuEbEFs_TuU" alt="Logo 3">
+    </div>
+
+    <h2>LinkedIn Certificate Sharing</h2>
+
+    <div class="info-box">
+      LinkedIn sharing helps you showcase your internship publicly and helps us verify and recognize your achievement. Submission of the LinkedIn post link is mandatory for final completion.
+    </div>
+
+    <div class="steps-box">
+      <strong>🔹 Steps:</strong>
+      <ul>
+        <li>Download your internship certificate</li>
+        <li>Post it on LinkedIn with the provided caption</li>
+        <li>Copy the LinkedIn post URL</li>
+        <li>Paste the URL of your post in the resp. sections below</li>
+      </ul>
+    </div>
+
+    <div class="benefits-box">
+      <div class="section-title">🎯 Benefits for You</div>
+
+      <ul class="benefit-list">
+        <li>Build a strong professional presence</li>
+        <li>Gain visibility among recruiters and industry professionals</li>
+        <li>Receive official recognition from IAC / GPI</li>
+        <li>Become eligible for future opportunities and referrals</li>
+      </ul>
+
+      <div class="highlight-box">
+        🌍 <strong>Global Visibility Opportunity</strong>
+        <p>
+          Cloud Counselage has network across <strong>75+ countries</strong>,
+          if you would want Cloud Counselage to promote you and your work on LinkedIn
+          to bring visibility among employers globally, please share the internship
+          certificate on LinkedIn and we shall promote it.
+        </p>
+      </div>
+
+      <div class="note-box">
+        ⚠️ Certificate validation will be marked only after LinkedIn sharing is submitted.
+      </div>
+    </div>
+
+    <div class="field-row">
+      <input id="fullName" placeholder="Full Name">
+      <input id="email" placeholder="Email">
+
+      <div class="gpi-field">
+        <label class="switch small">
+          <input type="checkbox" id="gpiToggle">
+          <span class="slider"></span>
+        </label>
+
+        <div class="gpi-content" id="gpiContent">
+          <span id="gpiText">Are You Part of GPI?</span>
+          <input type="text" id="internId" placeholder="Intern ID" />
+        </div>
+      </div>
+    </div>
+
+    <div id="lookupStatus" class="status-box"></div>
+
+    <div class="cert-card pledge-card">
+      <div class="cert-header">🌟 IAC Pledge (Mandatory)</div>
+
+      <div class="pledge-guide" style="padding: 15px; background: #f8fafc; border-radius: 8px; margin: 15px 0; border: 1px solid #e2e8f0;">
+        <div class="guide-header" style="font-weight: bold; color: #1e293b; margin-bottom: 8px;">
+          🎥 IAC Pledge Verification Tutorial
+        </div>
+        <p class="guide-description">
+          Please watch the short tutorial below to understand how to correctly publish and verify your IAC Pledge on LinkedIn before proceeding.
+        </p>
+        <div class="video-container">
+          <iframe
+            src="https://www.youtube.com/embed/SRH8oSfLySk"
+            title="IAC Pledge Verification Tutorial"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+          </iframe>
+        </div>
+        <details class="verification-conditions">
+          <summary><strong>👉 View Required LinkedIn Post Conditions</strong></summary>
+          <ul>
+            <li>✔ Your LinkedIn post must clearly mention <strong>IAC</strong>.</li>
+            <li>✔ The post must include <strong>IAC Pledge</strong>, <strong>#Pledge</strong>, or <strong>#IACPledge</strong>.</li>
+            <li>✔ Your post should include the official hashtags:
+              <strong>#CloudCounselage</strong>, <strong>#DolphinTankIndia</strong>, <strong>#DTI</strong>, <strong>#Ideathon</strong>, <strong>#Hackathon</strong>.
+            </li>
+            <li>✔ The post must contain meaningful description (minimum 60 characters).</li>
+            <li>✔ The LinkedIn post must belong to your own profile.</li>
+          </ul>
+        </details>
+      </div>
+
+      <hr style="margin: 0px 0; border: none; height: 1px; background: #f1f5f9;">
+      <input id="pledgeUrl" placeholder="Paste LinkedIn Post URL *" oninput="resetPledgeVerification()">
+      <textarea id="pledgeContent" placeholder="Paste LinkedIn Post Caption including hashtags *" oninput="resetPledgeVerification()"></textarea>
+      <button id="verifyBtn" onclick="verifyPledge()">Verify Pledge</button>
+    </div>
+
+    <div id="industrySection"></div>
+
+    <button class="submit-btn" onclick="submitData()">
+      Submit – IAC Verification
+    </button>
+  </div>
+
+  <div id="successScreen">
+    <div class="success-wrapper">
+      <div class="success-box">
+        ✅ Submission Successful
+        <br><br>
+        Your certificates are under review.
+      </div>
+
+      <div class="promotion-box">
+        <h3>🚀 Explore Our Newly Launched Programs</h3>
+
+        <p>
+          Continue your innovation journey with <strong>Dolphin Tank India (DTI)</strong>.
+          Participate in our newly launched <strong>DTI Ideathon</strong> and
+          <strong>DTI Hackathon</strong> designed to empower innovators,
+          problem solvers, and future entrepreneurs.
+        </p>
+
+        <div class="promo-cards">
+          <div class="promo-card">
+            <h4>💡 DTI Ideathon</h4>
+            <p>
+              Share innovative ideas, collaborate with like-minded participants,
+              and build solutions that address real-world challenges.
+            </p>
+            <a href="IDEATHON_LINK" target="_blank">Explore Ideathon</a>
+          </div>
+
+          <div class="promo-card">
+            <h4>⚡ DTI Hackathon</h4>
+            <p>
+              Transform your ideas into working solutions through rapid
+              development, mentorship, and real-world evaluation.
+            </p>
+            <a href="HACKATHON_LINK" target="_blank">Explore Hackathon</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="existingModal" class="modal-overlay">
+    <div class="modal-box">
+      <h3>Response Already Exists</h3>
+      <p>You have already submitted this form.</p>
+      <button onclick="autoLoadExisting()">Edit Response</button>
+    </div>
+  </div>
+
+  <div id="loaderOverlay">
+    <div class="spinner"></div>
+    <p>Checking...</p>
+  </div>
+
+  <script>
+    const API_BASE = "/.netlify/functions/iac-api";
+
+    async function api(action, payload = {}) {
+      const res = await fetch(API_BASE, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, ...payload })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || "Request failed");
+      }
+      return data.result;
+    }
+
+    let pledgeVerified = false;
+    let existingCheckDone = false;
+    let currentRowIndex = null;
+    let editMode = false;
+    let industryVerified = new Array(8).fill(false);
+
+    const industryTitles = [
+      "Industry Training – Data & Analytics",
+      "Industry Training – Github",
+      "Industry Training – Business Ethics & Values",
+      "Industry Training – Corporate Etiquettes",
+      "Industry Training – Business Communication",
+      "Industry Training – New Product Development",
+      "Industry Training – Cloud Computing",
+      "Industry Training – Project Management"
+    ];
+
+    const industryContainer = document.getElementById("industrySection");
+
+    industryTitles.forEach((title, i) => {
+      industryContainer.innerHTML += `
+        <div class="cert-card">
+          <div class="cert-header">${title}</div>
+          <input id="industry${i}" placeholder="Paste LinkedIn Post URL" oninput="resetIndustryVerification(${i})">
+          <textarea id="industryContent${i}" placeholder="Paste LinkedIn Post Caption including hashtags" oninput="resetIndustryVerification(${i})"></textarea>
+          <div style="margin-top:10px;">
+            <button id="industryBtn${i}" onclick="verifyIndustry(${i})">Verify</button>
+          </div>
+        </div>
+      `;
+    });
+
+    const gpiToggle = document.getElementById("gpiToggle");
+    const internId = document.getElementById("internId");
+    const gpiText = document.getElementById("gpiText");
+
+    gpiToggle.addEventListener("change", () => {
+      if (gpiToggle.checked) {
+        gpiText.textContent = "Yes";
+        internId.style.display = "block";
+      } else {
+        gpiText.textContent = "Are You Part of GPI?";
+        internId.style.display = "none";
+        internId.value = "";
+      }
+    });
+
+    document.getElementById("email").addEventListener("blur", checkExistingEmailAuto);
+
+    function isValidLinkedInPost(url) {
+      try {
+        const parsed = new URL(url.trim());
+        const allowedHosts = ["www.linkedin.com", "linkedin.com"];
+        if (!allowedHosts.includes(parsed.hostname)) return false;
+        if (!parsed.pathname.startsWith("/posts/")) return false;
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function validateNameInUrl(url) {
+      const fullName = document.getElementById("fullName").value.trim().toLowerCase();
+      if (!fullName) return false;
+
+      const firstName = fullName.split(" ")[0];
+      const lastName = fullName.split(" ")[1] || "";
+      const slugVersion = fullName.replace(/\s+/g, "-");
+      const lowerUrl = url.toLowerCase();
+
+      if (!lowerUrl.includes(firstName)) return false;
+
+      if (lastName && !(lowerUrl.includes(lastName) || lowerUrl.includes(slugVersion))) {
+        return false;
+      }
+
+      return true;
+    }
+
+    function validatePledgeContent(content) {
+      const text = content.toLowerCase().trim();
+
+      const hasPledge =
+        text.includes("iac pledge") ||
+        text.includes("#pledge") ||
+        text.includes("#iacpledge") ||
+        text.includes(" pledge");
+
+      const hasIAC =
+        text.includes("iac") ||
+        text.includes("#iac");
+
+      const isLongEnough = text.length >= 60;
+
+      return hasPledge && hasIAC && isLongEnough;
+    }
+
+    function validateIndustryContent(content) {
+      const text = content.toLowerCase().trim();
+
+      const hasKeyword =
+        text.includes("#industrytraining") ||
+        text.includes("#training") ||
+        text.includes("#workshop") ||
+        text.includes("training") ||
+        text.includes("workshop");
+
+      const isLongEnough = text.length >= 40;
+
+      return hasKeyword && isLongEnough;
+    }
+
+    function setStatus(message, type) {
+      const box = document.getElementById("lookupStatus");
+      box.style.display = "block";
+      box.style.borderColor = type === "error" ? "#fecaca" : "#dbeafe";
+      box.style.background = type === "error" ? "#fef2f2" : "#f8fafc";
+      box.style.color = type === "error" ? "#991b1b" : "#1e293b";
+      box.innerText = message;
+    }
+
+    function lockIdentityFields() {
+      document.getElementById("fullName").readOnly = true;
+      document.getElementById("email").readOnly = true;
+      document.getElementById("internId").readOnly = true;
+    }
+
+    function resetPledgeVerification() {
+      pledgeVerified = false;
+      const button = document.getElementById("verifyBtn");
+      button.innerText = "Verify Pledge";
+      button.style.background = "#273755";
+      button.disabled = false;
+    }
+
+    function resetIndustryVerification(index) {
+      industryVerified[index] = false;
+      const button = document.getElementById(`industryBtn${index}`);
+      button.innerText = "Verify";
+      button.style.background = "#273755";
+      button.disabled = false;
+    }
+
+    function markPledgeVerifiedUI() {
+      pledgeVerified = true;
+      const button = document.getElementById("verifyBtn");
+      button.innerText = "Verified ✓";
+      button.style.background = "#16a34a";
+      button.disabled = true;
+    }
+
+    function markIndustryVerifiedUI(index) {
+      industryVerified[index] = true;
+      const button = document.getElementById(`industryBtn${index}`);
+      button.innerText = "Verified ✓";
+      button.style.background = "#16a34a";
+      button.disabled = true;
+    }
+
+    function showLoader(show) {
+      const loader = document.getElementById("loaderOverlay");
+      const form = document.getElementById("formContainer");
+
+      if (show) {
+        loader.style.display = "flex";
+        form.classList.add("loading");
+      } else {
+        loader.style.display = "none";
+        form.classList.remove("loading");
+      }
+    }
+
+    function showModal() {
+      document.getElementById("existingModal").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("existingModal").style.display = "none";
+    }
+
+    async function loadPreviousSubmission() {
+      const email = document.getElementById("email").value.trim();
+      if (!email) {
+        alert("Please enter your email first.");
+        return;
+      }
+
+      try {
+        const result = await api("getSubmissionByEmail", { email });
+
+        if (!result || !result.found) {
+          setStatus("No previous response found for this email. You can submit a new response.", "info");
+          return;
+        }
+
+        const ok = confirm("Your response is already submitted. Do you want to edit the previous one?");
+        if (!ok) return;
+
+        const data = result.data;
+        currentRowIndex = data.rowIndex;
+        editMode = true;
+
+        document.getElementById("fullName").value = data.fullName || "";
+        document.getElementById("email").value = data.email || "";
+        document.getElementById("internId").value = data.internId || "";
+
+        document.getElementById("pledgeUrl").value = data.pledgeUrl || "";
+        document.getElementById("pledgeContent").value = data.pledgeContent || "";
+
+        for (let i = 0; i < 8; i++) {
+          document.getElementById(`industry${i}`).value = data.industryLinks[i] || "";
+          document.getElementById(`industryContent${i}`).value = data.industryContents[i] || "";
+        }
+
+        lockIdentityFields();
+
+        pledgeVerified = !!(data.pledgeUrl && data.pledgeContent);
+        if (pledgeVerified) markPledgeVerifiedUI();
+
+        for (let i = 0; i < 8; i++) {
+          industryVerified[i] = !!(data.industryLinks[i] && data.industryContents[i]);
+          if (industryVerified[i]) markIndustryVerifiedUI(i);
+        }
+
+        setStatus("Previous response loaded. You can update the existing entry and submit again.", "info");
+        closeModal();
+      } catch (err) {
+        alert("Error loading previous response: " + err.message);
+      }
+    }
+
+    async function autoLoadExisting() {
+      const email = document.getElementById("email").value.trim();
+      if (!email) {
+        closeModal();
+        return;
+      }
+
+      showLoader(true);
+
+      try {
+        const result = await api("getSubmissionByEmail", { email });
+        showLoader(false);
+
+        if (!result || !result.found) {
+          closeModal();
+          return;
+        }
+
+        const data = result.data;
+
+        if (data.internId) {
+          gpiToggle.checked = true;
+          internId.style.display = "block";
+          gpiText.textContent = "Yes";
+        } else {
+          gpiToggle.checked = false;
+          internId.style.display = "none";
+          gpiText.textContent = "Are You Part of GPI?";
+        }
+
+        currentRowIndex = data.rowIndex;
+        editMode = true;
+
+        document.getElementById("fullName").value = data.fullName || "";
+        document.getElementById("email").value = data.email || "";
+        document.getElementById("internId").value = data.internId || "";
+
+        document.getElementById("pledgeUrl").value = data.pledgeUrl || "";
+        document.getElementById("pledgeContent").value = data.pledgeContent || "";
+
+        for (let i = 0; i < 8; i++) {
+          document.getElementById(`industry${i}`).value = data.industryLinks[i] || "";
+          document.getElementById(`industryContent${i}`).value = data.industryContents[i] || "";
+        }
+
+        lockIdentityFields();
+
+        if (data.pledgeUrl && data.pledgeContent) markPledgeVerifiedUI();
+
+        for (let i = 0; i < 8; i++) {
+          if (data.industryLinks[i] && data.industryContents[i]) {
+            markIndustryVerifiedUI(i);
+          }
+        }
+
+        setStatus("Editing existing response. Update and submit.", "info");
+        closeModal();
+      } catch (err) {
+        showLoader(false);
+        alert("Error loading previous response: " + err.message);
+      }
+    }
+
+    async function checkExistingEmailAuto() {
+      if (editMode) return;
+
+      const email = document.getElementById("email").value.trim();
+      if (!email) return;
+
+      showLoader(true);
+
+      try {
+        const result = await api("getSubmissionByEmail", { email });
+        showLoader(false);
+
+        if (!result || !result.found) return;
+
+        currentRowIndex = result.data.rowIndex;
+        showModal();
+      } catch (err) {
+        showLoader(false);
+        alert("Error checking existing email: " + err.message);
+      }
+    }
+
+    async function verifyPledge() {
+      const urlInput = document.getElementById("pledgeUrl");
+      const contentInput = document.getElementById("pledgeContent");
+      const button = document.getElementById("verifyBtn");
+
+      const url = urlInput.value.trim();
+      const content = contentInput.value.trim();
+      const internIdValue = document.getElementById("internId").value.trim();
+
+      if (!internIdValue && gpiToggle.checked) {
+        alert("Please enter Intern ID first.");
+        return;
+      }
+
+      if (!isValidLinkedInPost(url)) {
+        alert("Invalid LinkedIn post URL.");
+        return;
+      }
+
+      if (!validateNameInUrl(url)) {
+        alert("LinkedIn post does not match intern name.");
+        return;
+      }
+
+      if (!validatePledgeContent(content)) {
+        alert("Post content does not match IAC Pledge requirements.");
+        return;
+      }
+
+      try {
+        const result = await api("checkPledgeDuplicate", {
+          pledgeUrl: url,
+          internId: internIdValue,
+          currentRowIndex
+        });
+
+        if (result.duplicateIntern) {
+          alert("This Intern ID has already submitted verification.");
+          return;
+        }
+
+        if (result.duplicateUrl) {
+          alert("This Pledge LinkedIn post has already been submitted.");
+          return;
+        }
+
+        pledgeVerified = true;
+        button.innerText = "Verified ✓";
+        button.style.background = "#16a34a";
+        button.disabled = true;
+
+        urlInput.disabled = true;
+        contentInput.disabled = true;
+
+        alert("IAC Pledge Verified ✓");
+      } catch (err) {
+        alert("Verification error: " + err.message);
+      }
+    }
+
+    async function verifyIndustry(index) {
+      const input = document.getElementById(`industry${index}`);
+      const button = document.getElementById(`industryBtn${index}`);
+      const url = input.value.trim();
+      const content = document.getElementById(`industryContent${index}`).value.trim();
+
+      if (!isValidLinkedInPost(url)) {
+        alert("Invalid LinkedIn post URL.");
+        return;
+      }
+
+      if (!validateNameInUrl(url)) {
+        alert("LinkedIn post does not match intern name.");
+        return;
+      }
+
+      if (!validateIndustryContent(content)) {
+        alert("Post content does not match Industry Training requirements.");
+        return;
+      }
+
+      try {
+        const result = await api("checkIndustryDuplicate", {
+          industryUrl: url,
+          currentRowIndex
+        });
+
+        if (result.duplicateIndustry) {
+          alert("This Industry LinkedIn post has already been submitted by another intern.");
+          return;
+        }
+
+        industryVerified[index] = true;
+        button.innerText = "Verified ✓";
+        button.style.background = "#16a34a";
+        button.disabled = true;
+
+        input.disabled = true;
+        document.getElementById(`industryContent${index}`).disabled = true;
+
+        alert("Industry Training Verified ✓");
+      } catch (err) {
+        alert("Verification error: " + err.message);
+      }
+    }
+
+    async function submitData() {
+      const fullName = document.getElementById("fullName").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const internIdValue = gpiToggle.checked ? document.getElementById("internId").value.trim() : "";
+
+      if (!fullName || !email || (gpiToggle.checked && !internIdValue)) {
+        alert("Please fill all required intern details.");
+        return;
+      }
+
+      if (!pledgeVerified) {
+        alert("IAC Pledge verification is mandatory.");
+        return;
+      }
+
+      const atLeastOneIndustry = industryVerified.some(v => v);
+      if (!atLeastOneIndustry) {
+        alert("Please verify at least ONE Industry Training certificate.");
+        return;
+      }
+
+      const industryLinks = [];
+      const industryContents = [];
+
+      for (let i = 0; i < 8; i++) {
+        const input = document.getElementById(`industry${i}`);
+        const contentInput = document.getElementById(`industryContent${i}`);
+
+        const url = input.value.trim();
+        const content = contentInput.value.trim();
+
+        industryLinks.push(url || "");
+        industryContents.push(content || "");
+      }
+
+      try {
+        await api("submitForm", {
+          data: {
+            rowIndex: currentRowIndex,
+            fullName,
+            email,
+            internId: internIdValue,
+            pledgeUrl: document.getElementById("pledgeUrl").value.trim(),
+            pledgeContent: document.getElementById("pledgeContent").value.trim(),
+            industryLinks,
+            industryContents
+          }
+        });
+
+        document.getElementById("formContainer").style.display = "none";
+        document.getElementById("successScreen").style.display = "flex";
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+  </script>
+</body>
+</html>

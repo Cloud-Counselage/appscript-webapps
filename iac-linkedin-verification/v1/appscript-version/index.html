@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      margin: 0;
+      padding: 40px 20px;
+      min-height: 100vh;
+
+      background: linear-gradient(
+        135deg,
+        #273755 0%,
+        #273755 44%,
+        #FEC601 44%,
+        #FEC601 62%,
+        #EA7317 62%,
+        #EA7317 78%,
+        #3DA5D9 78%,
+        #3DA5D9 100%
+      );
+    }
+
+    .container {
+      max-width: 1050px;
+      margin: auto;
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 25px 60px rgba(39,55,85,0.25);
+    }
+
+    /* LOGOS */
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .logo {
+      height: 65px;
+      object-fit: contain;
+    }
+
+    /* HEADINGS */
+    h2 {
+      text-align: center;
+      color: #273755;
+      margin-bottom: 25px;
+      font-weight: bold;
+    }
+
+    /* HELP SECTIONS */
+    .info-box {
+      background: #f9fafb;
+      border-left: 5px solid #3DA5D9;
+      padding: 18px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .steps-box {
+      background: #fffdf2;
+      border-left: 5px solid #FEC601;
+      padding: 18px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+
+    .benefits-box {
+      background: #f4faff;
+      border-left: 5px solid #273755;
+      padding: 18px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      font-size: 16px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1.5px solid #e5e7eb;
+      background: #f9fafb;
+      font-size: 14px;
+      font-family: "Times New Roman", Times, serif;
+      transition: 0.3s;
+    }
+    /* Placeholder styling fix */
+    ::placeholder {
+      font-family: "Times New Roman", Times, serif;
+      color: #475569;
+      opacity: 1;
+    }
+
+    ::-webkit-input-placeholder {
+      font-family: "Times New Roman", Times, serif;
+    }
+
+    ::-moz-placeholder {
+      font-family: "Times New Roman", Times, serif;
+    }
+
+    :-ms-input-placeholder {
+      font-family: "Times New Roman", Times, serif;
+    }
+    
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #3DA5D9;
+      box-shadow: 0 0 0 4px rgba(61,165,217,0.25);
+      background: #fff;
+    }
+
+    .cert-card {
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 12px 30px rgba(39,55,85,0.08);
+    }
+
+    .pledge-card {
+      border: 2px solid #FEC601;
+      background: #fffdf2;
+      box-shadow: 0 15px 45px rgba(254,198,1,0.25);
+    }
+
+    .cert-header {
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #273755;
+    }
+
+    button {
+      background: #273755;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-family: "Times New Roman", Times, serif;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1c2a44;
+    }
+
+    .submit-btn {
+      width: 100%;
+      height: 55px;
+      margin-top: 30px;
+      font-size: 16px;
+      font-family: "Times New Roman", Times, serif;
+      background: #EA7317;
+    }
+
+    .submit-btn:hover {
+      background: #d66112;
+    }
+
+    /* SUCCESS SCREEN */
+
+    #successScreen {
+      display: none;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+      background: #273755;
+      color: white;
+      font-size: 20px;
+      text-align: center;
+    }
+
+    .success-box {
+      background: white;
+      color: #273755;
+      padding: 60px;
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+    .success-wrapper{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:30px;
+    }
+
+    .promotion-box{
+      background:white;
+      padding:35px;
+      border-radius:20px;
+      width:850px;
+      max-width:90%;
+      box-shadow:0 20px 45px rgba(0,0,0,0.18);
+      text-align:center;
+    }
+    .promotion-box h3{
+      color:#273755;
+      font-size:24px;
+      font-weight:700;
+      border-bottom:2px solid #EA7317;
+      display:inline-block;
+      padding-bottom:6px;
+    }
+    .promotion-box p{
+      color:#374151;
+      font-size:15px;
+      line-height:1.6;
+      max-width:650px;
+      margin:auto;
+    }
+    .promo-cards{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:25px;
+      margin-top:25px;
+    }
+    .promo-card h4{
+      color:#273755 !important;
+      font-weight:600;
+      font-size:18px;
+    }
+    .promo-card{
+      background:#f9fafb;
+      padding:22px;
+      border-radius:14px;
+      border:1px solid #e5e7eb;
+      transition:0.3s;
+    }
+
+    .promo-card:hover{
+      transform:translateY(-4px);
+      box-shadow:0 10px 25px rgba(0,0,0,0.1);
+    }
+    .promo-card a{
+      display:inline-block;
+      margin-top:12px;
+      padding:10px 18px;
+      background:#EA7317;
+      color:white;
+      text-decoration:none;
+      border-radius:8px;
+      font-size:14px;
+    }
+
+    .promo-card a:hover{
+      background:#d66112;
+    }
+    .video-container {
+      position: relative;
+      width: 100%;
+      max-width: 320px;   /* video width control */
+      aspect-ratio: 16 / 9;  /* standard youtube ratio */
+      margin-top: 12px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+    .guide-description{
+      font-size:15px;
+      color:#000000;
+      line-height:1.6;
+    }
+    .verification-conditions summary{
+      font-size:15px;
+      font-weight:600;
+      color:#1e293b;
+      cursor:pointer;
+    }
+    .verification-conditions ul{
+      font-size:14.5px;
+      line-height:1.7;
+      margin-top:8px;
+      color:#000000;
+    }
+
+    .video-container iframe {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container" id="formContainer">
+
+  <!-- LOGOS -->
+  <div class="top-row">
+    <img class="logo" src="https://drive.google.com/thumbnail?id=1Y4gruQZD5gtX-GVB6aZ2poorv9oG6Ez8">
+    <img class="logo" src="https://drive.google.com/thumbnail?id=1mmugbHg8QETtsBj2CigBq7RzKwsjKQNK">
+    <img class="logo" src="https://drive.google.com/thumbnail?id=1GPqAwys9LdaNHp5ovY4bLsuEbEFs_TuU">
+  </div>
+
+  <h2>LinkedIn Certificate Sharing</h2>
+
+  <!-- HELP TEXT 1 -->
+  <div class="info-box">
+    LinkedIn sharing helps you showcase your internship publicly and helps us verify and recognize your achievement. Submission of the LinkedIn post link is mandatory for final completion.
+  </div>
+
+  <!-- HELP TEXT 2 -->
+  <div class="steps-box">
+    <strong>🔹 Steps:</strong>
+    <ul>
+      <li>Download your internship certificate</li>
+      <li>Post it on LinkedIn with the provided caption</li>
+      <li>Copy the LinkedIn post URL</li>
+      <li>Paste the link in this platform</li>
+    </ul>
+  </div>
+
+  <div class="benefits-box">
+    <strong>🎯 Benefits for You:</strong>
+    <ul>
+      <li>Build a strong professional presence</li>
+      <li>Get visibility among recruiters and industry professionals</li>
+      <li>Receive official recognition from IAC / GPI</li>
+      <li>Become eligible for future opportunities and referrals</li>
+    </ul>
+    <strong>⚠️ Note:</strong> Certificate validation will be marked only after LinkedIn sharing is submitted.
+  </div>
+
+  <!-- INTERN DETAILS -->
+  <div class="field-row">
+    <input id="fullName" placeholder="Full Name">
+    <input id="email" placeholder="Email">
+    <input id="internId" placeholder="Intern ID">
+  </div>
+
+  <!-- IAC PLEDGE -->
+  <div class="cert-card pledge-card">
+    <div class="cert-header">🌟 IAC Pledge (Mandatory)</div>
+    <div class="pledge-guide" style="padding: 15px; background: #f8fafc; border-radius: 8px; margin: 15px 0; border: 1px solid #e2e8f0;">
+      <div class="guide-header" style="font-weight: bold; color: #1e293b; margin-bottom: 8px;">
+        🎥 IAC Pledge Verification Tutorial
+      </div>
+      <p class="guide-description">
+        Please watch the short tutorial below to understand how to correctly publish and verify your IAC Pledge on LinkedIn before proceeding.
+      </p>
+      <div class="video-container">
+        <iframe 
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+          src="https://www.youtube.com/embed/SRH8oSfLySk" 
+          title="IAC Pledge Verification Tutorial" 
+          frameborder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          allowfullscreen>
+        </iframe>
+      </div>
+      <details class="verification-conditions">
+        <summary><strong>👉 View Required LinkedIn Post Conditions</strong></summary>
+        <ul>
+          <li> ✔ Your LinkedIn post must clearly mention <strong>IAC</strong>.</li>
+          <li> ✔ The post must include <strong>IAC Pledge</strong>, <strong>#Pledge</strong>, or <strong>#IACPledge</strong>.</li>
+          <li> ✔ Your post should include the official hashtags: 
+            <strong>#CloudCounselage</strong>, <strong>#DolphinTankIndia</strong>, <strong>#DTI</strong>, <strong>#Ideathon</strong>, <strong>#Hackathon</strong>.
+          </li>
+          <li> ✔ The post must contain meaningful description (minimum 60 characters).</li>
+          <li> ✔ The LinkedIn post must belong to your own profile.</li>
+        </ul>
+      </details>
+    </div> 
+    <hr style="margin: 0px 0; border: none; height: 1px; background: #f1f5f9;">
+    <input id="pledgeUrl" placeholder="Paste LinkedIn Post URL *">
+    <textarea id="pledgeContent" placeholder="Paste LinkedIn Post Caption including hashtags *"></textarea>
+    <button id="verifyBtn" onclick="verifyPledge()">Verify Pledge</button>
+    
+  </div>     
+
+  <!-- INDUSTRY TRAINING -->
+  <div id="industrySection"></div>
+
+  <button class="submit-btn" onclick="submitData()">
+    Submit – IAC Verification
+  </button>
+
+</div>
+
+<!-- SUCCESS SCREEN -->
+<div id="successScreen">
+
+  <div class="success-wrapper">
+
+    <!-- SUCCESS MESSAGE -->
+    <div class="success-box">
+      ✅ Submission Successful
+      <br><br>
+      Your certificates are under review.
+    </div>
+
+    <!-- PROMOTION SECTION -->
+    <div class="promotion-box">
+
+      <h3>🚀 Explore Our Newly Launched Programs</h3>
+
+      <p>
+        Continue your innovation journey with <strong>Dolphin Tank India (DTI)</strong>.
+        Participate in our newly launched <strong>DTI Ideathon</strong> and
+        <strong>DTI Hackathon</strong> designed to empower innovators,
+        problem solvers, and future entrepreneurs.
+      </p>
+
+      <div class="promo-cards">
+
+        <div class="promo-card">
+          <h4>💡 DTI Ideathon</h4>
+          <p>
+            Share innovative ideas, collaborate with like-minded participants,
+            and build solutions that address real-world challenges.
+          </p>
+          <a href="IDEATHON_LINK" target="_blank">Explore Ideathon</a>
+        </div>
+
+        <div class="promo-card">
+          <h4>⚡ DTI Hackathon</h4>
+          <p>
+            Transform your ideas into working solutions through rapid
+            development, mentorship, and real-world evaluation.
+          </p>
+          <a href="HACKATHON_LINK" target="_blank">Explore Hackathon</a>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+let pledgeVerified = false;
+let industryVerified = new Array(8).fill(false);
+
+const industryTitles = [
+  "Industry Training – Data & Analytics",
+  "Industry Training – Github",
+  "Industry Training – Business Ethics & Values",
+  "Industry Training – Corporate Etiquettes",
+  "Industry Training – Business Communication",
+  "Industry Training – New Product Development",
+  "Industry Training – Cloud Computing",
+  "Industry Training – Project Management"
+];
+
+const industryContainer = document.getElementById("industrySection");
+
+industryTitles.forEach((title, i) => {
+  industryContainer.innerHTML += `
+    <div class="cert-card">
+      <div class="cert-header">${title}</div>
+      <input id="industry${i}" placeholder="Paste LinkedIn Post URL">
+      <div style="margin-top:10px;">
+        <button onclick="verifyIndustry(${i})">Verify</button>
+      </div>
+    </div>
+  `;
+});
+
+function isValidLinkedInPost(url) {
+
+  try {
+    const parsed = new URL(url.trim());
+
+    const allowedHosts = ["www.linkedin.com", "linkedin.com"];
+    if (!allowedHosts.includes(parsed.hostname)) return false;
+
+    // Only allow profile posts format
+    if (!parsed.pathname.startsWith("/posts/")) return false;
+
+    return true;
+
+  } catch (e) {
+    return false;
+  }
+}
+function validateNameInUrl(url) {
+
+  const fullName = document.getElementById("fullName").value.trim().toLowerCase();
+  if (!fullName) return false;
+
+  const firstName = fullName.split(" ")[0];
+  const lastName = fullName.split(" ")[1] || "";
+
+  const slugVersion = fullName.replace(/\s+/g, "-");
+
+  const lowerUrl = url.toLowerCase();
+
+  // Must contain first name
+  if (!lowerUrl.includes(firstName)) return false;
+
+  // If last name exists, at least first or full slug must match
+  if (lastName && !(lowerUrl.includes(lastName) || lowerUrl.includes(slugVersion))) {
+    return false;
+  }
+
+  return true;
+}
+
+function validatePledgeContent(content) {
+
+  const text = content.toLowerCase().trim();
+
+  const hasPledge =
+      text.includes("iac pledge") ||
+      text.includes("#pledge") ||
+      text.includes("#iacpledge") ||
+      text.includes(" pledge");
+
+  const hasIAC =
+      text.includes("iac") ||
+      text.includes("#iac");
+
+  const isLongEnough = text.length >= 60;
+
+  return hasPledge && hasIAC && isLongEnough;
+}
+
+function verifyPledge() {
+
+  const urlInput = document.getElementById("pledgeUrl");
+  const contentInput = document.getElementById("pledgeContent");
+  const button = document.querySelector(".pledge-card button");
+
+  const url = urlInput.value.trim();
+  const content = contentInput.value.trim();
+  const internId = document.getElementById("internId").value.trim();
+
+  if (!internId) {
+    alert("Please enter Intern ID first.");
+    return;
+  }
+
+  if (!isValidLinkedInPost(url)) {
+    alert("Invalid LinkedIn post URL.");
+    return;
+  }
+
+  if (!validateNameInUrl(url)) {
+    alert("LinkedIn post does not match intern name.");
+    return;
+  }
+
+  if (!validatePledgeContent(content)) {
+    alert("Post content does not match IAC Pledge requirements.");
+    return;
+  }
+
+  // 🔥 IMPORTANT: BACKEND DUPLICATE CHECK HERE
+  google.script.run
+    .withSuccessHandler(result => {
+
+      if (result.duplicateIntern) {
+        alert("This Intern ID has already submitted verification.");
+        return;
+      }
+
+      if (result.duplicateUrl) {
+        alert("This Pledge LinkedIn post has already been submitted.");
+        return;
+      }
+
+      // Only if safe → mark verified
+      pledgeVerified = true;
+
+      button.innerText = "Verified ✓";
+      button.style.background = "#16a34a";
+      button.disabled = true;
+
+      urlInput.disabled = true;
+      contentInput.disabled = true;
+
+      alert("IAC Pledge Verified ✓");
+
+    })
+    .withFailureHandler(err => {
+      alert("Verification error: " + err.message);
+    })
+    .checkPledgeDuplicate(url, internId);
+}
+
+function verifyIndustry(index) {
+
+  const input = document.getElementById(`industry${index}`);
+  const buttons = document.querySelectorAll("#industrySection button");
+  const button = buttons[index];
+
+  const url = input.value.trim();
+
+  if (!isValidLinkedInPost(url)) {
+    alert("Invalid LinkedIn post URL.");
+    return;
+  }
+
+  if (!validateNameInUrl(url)) {
+    alert("LinkedIn post does not match intern name.");
+    return;
+  }
+
+  // 🔥 BACKEND DUPLICATE CHECK
+  google.script.run
+    .withSuccessHandler(result => {
+
+      if (result.duplicateIndustry) {
+        alert("This Industry LinkedIn post has already been submitted by another intern.");
+        return;
+      }
+
+      // Only if safe
+      industryVerified[index] = true;
+
+      button.innerText = "Verified ✓";
+      button.style.background = "#16a34a";
+      button.disabled = true;
+
+      input.disabled = true;
+
+      alert("Industry Training Verified ✓");
+
+    })
+    .withFailureHandler(err => {
+      alert("Verification error: " + err.message);
+    })
+    .checkIndustryDuplicate(url);
+}
+function submitData() {
+
+  const fullName = document.getElementById("fullName").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const internId = document.getElementById("internId").value.trim();
+
+  if (!fullName || !email || !internId) {
+    alert("Please fill all intern details.");
+    return;
+  }
+
+  if (!pledgeVerified) {
+    alert("IAC Pledge verification is mandatory.");
+    return;
+  }
+
+  const atLeastOneIndustry = industryVerified.some(v => v);
+
+  if (!atLeastOneIndustry) {
+    alert("Please verify at least ONE Industry Training certificate.");
+    return;
+  }
+
+  const industryLinks = [];
+  for (let i = 0; i < 8; i++) {
+    const input = document.getElementById(`industry${i}`);
+    if (input && industryVerified[i]) {
+      industryLinks.push(input.value.trim());
+    } else {
+      industryLinks.push("Not Submitted");
+    }    
+  }
+  google.script.run
+    .withSuccessHandler(() => {
+
+      // hide form
+      document.getElementById("formContainer").style.display = "none";
+
+      // show full screen success
+      document.getElementById("successScreen").style.display = "flex";
+
+    })
+    .withFailureHandler(err => {
+      alert(err.message);
+    })  
+    .submitForm({
+      fullName,
+      email,
+      internId,
+      pledgeUrl: document.getElementById("pledgeUrl").value.trim(),
+      pledgeContent: document.getElementById("pledgeContent").value.trim(),
+      industryLinks
+    });
+}
+
+</script>
+
+</body>
+</html>

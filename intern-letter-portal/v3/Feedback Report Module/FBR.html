@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <style>
+      :root {
+        --primary-gradient-start: #ea7317;
+        --primary-gradient-end: #ea7317;
+        --primary-color: #3da5d9;
+        --secondary-color: #5a6271;
+        --success-color: #ea7317;
+        --error-color: #f11023;
+        --text-dark: #333;
+        --text-medium: #666;
+        --white: #ffffff;
+      }
+      
+      body { 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+        background: linear-gradient(135deg, var(--primary-gradient-start) 0%, var(--primary-gradient-end) 100%);
+        min-height: 100vh;
+        padding: 20px;
+        margin: 0;
+      }
+      
+      h2 { font-size: 28px; font-weight: 600; margin-top: 0; color: var(--text-dark);}
+      label { font-size: 14px; font-weight: 600; display: block; margin-bottom: 8px;}
+      
+      .container {
+        max-width: 800px;
+        padding: 35px;
+        border-radius: 15px;
+        margin: 0 auto;
+        background: var(--white);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      }
+      
+      .btn {
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        white-space: nowrap; 
+      }
+      .btn.primary {
+        background: linear-gradient(135deg, var(--primary-gradient-start) 0%, var(--primary-gradient-end) 100%);
+        color: var(--white);
+      }
+      .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+      
+      input[type="text"] {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 15px;
+        box-sizing: border-box;
+      }
+      input[type="text"]:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(234, 115, 23, 0.1);
+      }
+
+      .search-row { 
+        display: flex; 
+        gap: 15px; 
+        align-items: flex-start; 
+        width: 100%;
+      }
+      .input-wrap { 
+        position: relative; 
+        flex: 1; 
+        min-width: 0; 
+      }
+      .search-btn { height: 47px; }
+
+      .help-text { font-size: 13px; color: var(--text-medium); margin-top: 6px; display: block; }
+      
+      .suggestions {
+        border: 2px solid var(--primary-color);
+        background: #fff;
+        max-height: 220px;
+        overflow-y: auto;
+        position: absolute;
+        z-index: 1000;
+        left: 0;
+        right: 0;
+        top: calc(100% + 4px);
+        display: none;
+        border-radius: 8px;
+      }
+      .suggestion-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f1f3f5; }
+      .suggestion-item:hover { background: rgba(234,115,23,0.06); color: var(--primary-color); padding-left: 18px; }
+
+      /* FRONTEND UI REPORT */
+      #report-wrapper { display: none; margin-top: 40px; border-top: 2px solid #eee; padding-top: 30px; }
+      
+      .logo-container { text-align: center; margin-bottom: 15px; }
+      .report-logo { display: inline-block; max-width: 120px; height: auto; }
+      
+      .report-title { text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 25px; color: #000; }
+      
+      .details-grid p { margin: 6px 0; font-weight: bold; font-size: 13px; color: #000;}
+      .details-grid span { font-weight: normal; }
+
+      table.feedback-table { width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 13px; }
+      table.feedback-table th, table.feedback-table td { border: 1px solid #000; padding: 8px 10px; color: #000;}
+      table.feedback-table th { text-align: center; font-weight: bold; background: #f4f4f4; }
+      
+      .col1 { width: 8%; text-align: center; }
+      .col2 { width: 42%; text-align: left; }
+      .col3 { width: 20%; text-align: center; }
+      .col4 { width: 30%; text-align: left; }
+
+      .footer-section p { font-weight: bold; margin: 6px 0; color: #000; font-size: 13px;}
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #ddd;
+        border-top: 4px solid #EA7317;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin:auto;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      #status-msg { margin-top: 15px; font-weight: 600; }
+      .error { color: var(--error-color); }
+      .loading { color: var(--primary-color); }
+      #flash-message { display: none; background: #28a745; color: white; text-align: center; padding: 12px; border-radius: 8px; margin-top: 20px; font-weight: bold; }
+      
+      @media (max-width: 500px) { 
+        .search-row { flex-direction: column; } 
+        .search-btn { width: 100%; } 
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="container">
+      <h2>Intern Feedback Report</h2>
+
+      <div class="field" style="margin-bottom: 20px;">
+        <label>Search Intern</label>
+        <div class="search-row" style="flex-direction: column;">
+          <div class="input-wrap">
+            <input type="text" id="internInput" placeholder="Type to search..." autocomplete="off" />
+            <select id="domainSelect" style="display:none; margin-top:10px; padding:8px; border-radius:6px;">
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="status-msg"></div>
+      <div id="flash-message">The document has been downloaded successfully!</div>
+
+      <div id="report-wrapper">
+
+        
+        
+        <div class="logo-container">
+          <img id="ui-logo" src="" alt="Company Logo" class="report-logo" style="display: none;">
+        </div>
+        
+        <div class="report-title">Corporate Feedback for Internship</div>
+        
+        <div class="details-grid">
+          <p>Name of the candidate: <span id="ui-name"></span></p>
+          <p>Intern ID: <span id="ui-id"></span></p>
+          <p>Designation: <span>Intern</span></p>
+          <p>Name of the Organization: <span>Cloud Counselage Pvt. Ltd.</span></p>
+          <div><b>Domain:</b> <span id="ui-domain"></span></div>
+          <p>Date of Appointment: <span id="ui-date"></span></p>
+          <br>
+        </div>
+
+        <table class="feedback-table">
+          <thead>
+            <tr>
+              <th class="col1">Sr.No.</th>
+              <th class="col2">Parameters</th>
+              <th class="col3">Level of Satisfaction<br>(out of 5)</th>
+              <th class="col4">Remarks/Suggestions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="col1">1</td><td class="col2">Willingness to learn</td><td class="col3" id="s-will"></td><td class="col4" id="r-will"></td></tr>
+            <tr><td class="col1">2</td><td class="col2">Domain/ subject knowledge</td><td class="col3" id="s-dom"></td><td class="col4" id="r-dom"></td></tr>
+            <tr><td class="col1">3</td><td class="col2">Communication Skills</td><td class="col3" id="s-com"></td><td class="col4" id="r-com"></td></tr>
+            <tr><td class="col1">4</td><td class="col2">Technical skills set</td><td class="col3" id="s-tech"></td><td class="col4" id="r-tech"></td></tr>
+            <tr><td class="col1">5</td><td class="col2">Attendance & Punctuality</td><td class="col3" id="s-att"></td><td class="col4" id="r-att"></td></tr>
+          </tbody>
+        </table>
+
+        <div class="footer-section">
+          <p>Industry Mentor: <span style="font-weight:normal;" id="ui-mentor"></span></p>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+          <button class="btn primary" id="downloadBtn">Download as PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const TOKEN = "<?= token ?>";
+      let CURRENT_INTERN_ID = "";
+      let CURRENT_DOMAIN = "";
+      function autoSearchWithToken(token) {
+
+        document.getElementById("internInput").value = "Fetching...";
+        document.getElementById("internInput").readOnly = true;
+
+        document.getElementById("status-msg").innerHTML =
+          '<span class="loading">Fetching your report...</span>';
+
+        google.script.run
+          .withSuccessHandler(function(res) {
+
+            if (!res || !res.success) {
+              document.getElementById("status-msg").innerHTML =
+                `<span class="error">${res ? res.message : "Access denied"}</span>`;
+              return;
+            }
+
+            // ✅ CLEAR STATUS
+            document.getElementById("status-msg").innerHTML = "";
+
+            // ✅ FULL UI RENDER (IMPORTANT 🔥)
+            document.getElementById("internInput").value = res.internId || "Report Fetched ✅";
+            document.getElementById("ui-name").innerText = res.name || "";
+            document.getElementById("ui-id").innerText = res.internId || "";
+            CURRENT_INTERN_ID = res.internId;
+            // 🔥 FETCH DOMAINS AFTER INTERN FOUND
+            google.script.run
+              .withSuccessHandler(function(res2) {
+
+                if (!res2.success) return;
+
+                const domains = res2.domains;
+                const dropdown = document.getElementById("domainSelect");
+
+                dropdown.innerHTML = "";
+
+                if (domains.length === 1) {
+
+                  dropdown.style.display = "none";
+
+                  CURRENT_DOMAIN = domains[0];
+                  document.getElementById("ui-domain").innerText = CURRENT_DOMAIN;
+                  loadReport(CURRENT_INTERN_ID, CURRENT_DOMAIN);
+
+                } else if (domains.length > 1) {
+
+                  dropdown.style.display = "block";
+
+                  domains.forEach(d => {
+                    const opt = document.createElement("option");
+                    opt.value = d;
+                    opt.textContent = d;
+                    dropdown.appendChild(opt);
+                  });
+
+                  CURRENT_DOMAIN = domains[0];
+                  document.getElementById("ui-domain").innerText = CURRENT_DOMAIN;
+                  loadReport(CURRENT_INTERN_ID, CURRENT_DOMAIN);
+                }
+
+              })
+              .getInternDomains(res.internId);
+            document.getElementById("ui-date").innerText = res.dateOfAppointment || "";
+            document.getElementById("ui-mentor").innerText = res.mentor || "";
+
+            // ✅ SCORES
+            document.getElementById("s-will").innerText = res.scores?.willingness?.score || "-";
+            document.getElementById("r-will").innerText = res.scores?.willingness?.remark || "-";
+
+            document.getElementById("s-dom").innerText = res.scores?.domain?.score || "-";
+            document.getElementById("r-dom").innerText = res.scores?.domain?.remark || "-";
+
+            document.getElementById("s-com").innerText = res.scores?.communication?.score || "-";
+            document.getElementById("r-com").innerText = res.scores?.communication?.remark || "-";
+
+            document.getElementById("s-tech").innerText = res.scores?.technical?.score || "-";
+            document.getElementById("r-tech").innerText = res.scores?.technical?.remark || "-";
+
+            document.getElementById("s-att").innerText = res.scores?.attendance?.score || "-";
+            document.getElementById("r-att").innerText = res.scores?.attendance?.remark || "-";
+
+            // ✅ SHOW REPORT
+            document.getElementById("report-wrapper").style.display = "block";
+
+          })
+          .withFailureHandler(function(err) {
+            document.getElementById("status-msg").innerHTML =
+              `<span class="error">Error: ${err.message}</span>`;
+          })
+          .loadInternDetailsByToken(token);
+      }
+      function showLoading() {
+        document.getElementById("loadingOverlay").style.display = "flex";
+      }
+
+      function hideLoading() {
+        document.getElementById("loadingOverlay").style.display = "none";
+      }
+      function loadReport(internId, domain) {
+        google.script.run
+          .withSuccessHandler(function(res) {
+
+            if (!res.success) {
+              hideLoading();
+              return;
+            }
+
+            document.getElementById("ui-name").innerText = res.name;
+            document.getElementById("ui-id").innerText = res.internId;
+            document.getElementById("ui-domain").innerText = domain;
+
+            document.getElementById("ui-date").innerText = res.dateOfAppointment;
+            document.getElementById("ui-mentor").innerText = res.mentor;
+
+            document.getElementById("s-will").innerText = res.scores.willingness.score;
+            document.getElementById("r-will").innerText = res.scores.willingness.remark;
+
+            document.getElementById("s-dom").innerText = res.scores.domain.score;
+            document.getElementById("r-dom").innerText = res.scores.domain.remark;
+
+            document.getElementById("s-com").innerText = res.scores.communication.score;
+            document.getElementById("r-com").innerText = res.scores.communication.remark;
+
+            document.getElementById("s-tech").innerText = res.scores.technical.score;
+            document.getElementById("r-tech").innerText = res.scores.technical.remark;
+
+            document.getElementById("s-att").innerText = res.scores.attendance.score;
+            document.getElementById("r-att").innerText = res.scores.attendance.remark;
+
+            document.getElementById("report-wrapper").style.display = "block";
+
+            hideLoading(); // 🔥 END LOADING
+
+          })
+          .loadInternDetails(internId, domain);
+      }
+      const $ = id => document.getElementById(id);
+      let allInternIds = [];
+
+      window.addEventListener("load", function () {
+
+        // 🔹 Load IDs
+        google.script.run.withSuccessHandler(function(ids) {
+          allInternIds = ids || [];
+        }).getInternIds();
+
+        // 🔹 Load logo
+        google.script.run.withSuccessHandler(function(base64) {
+          if (base64) {
+            document.getElementById('ui-logo').src = base64;
+            document.getElementById('ui-logo').style.display = 'inline-block';
+          }
+        }).getLogoBase64();
+
+        console.log("TOKEN:", TOKEN);
+
+        if (TOKEN && TOKEN !== "TOKEN_PLACEHOLDER") {
+          setTimeout(() => {
+            autoSearchWithToken(TOKEN);
+          }, 500);
+        }
+
+      });
+
+      $('internInput').addEventListener('input', function() {
+        const box = $('suggestions');
+        const q = this.value.toLowerCase().trim();
+        box.innerHTML = '';
+        if (!q) { box.style.display = 'none'; return; }
+
+        const matches = allInternIds.filter(x => x.toLowerCase().includes(q)).slice(0, 50);
+        if (!matches.length) { box.style.display = 'none'; return; }
+
+        matches.forEach(m => {
+          const div = document.createElement('div');
+          div.className = 'suggestion-item';
+          div.textContent = m;
+          div.addEventListener('click', () => {
+            $('internInput').value = m;
+            box.style.display = 'none';
+            autoSearch(m);
+          });
+          box.appendChild(div);
+        });
+        box.style.display = 'block';
+      });
+
+      document.addEventListener('click', e => {
+        if (!$('suggestions').contains(e.target) && e.target !== $('internInput')) {
+          $('suggestions').style.display = 'none';
+        }
+      });
+
+      
+
+      $('downloadBtn').addEventListener('click', function() {
+        const internId = $('ui-id').innerText;
+        const domain = CURRENT_DOMAIN;
+        this.disabled = true;
+        this.innerText = 'Generating High-Quality PDF...';
+        $('flash-message').style.display = 'none';
+
+        google.script.run.withSuccessHandler(base64Str => {
+          try {
+            const byteCharacters = atob(base64Str);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+              byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: 'application/pdf' });
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Feedback_Report_${internId}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            setTimeout(() => URL.revokeObjectURL(link.href), 100);
+
+            this.disabled = false;
+            this.innerText = 'Download as PDF';
+            
+            const flash = $('flash-message');
+            flash.style.display = 'block';
+            setTimeout(() => { flash.style.display = 'none'; }, 5000);
+            
+          } catch (e) {
+            alert('Download failed during file construction: ' + e.message);
+            this.disabled = false;
+            this.innerText = 'Download as PDF';
+          }
+        }).withFailureHandler(err => {
+          alert('Failed to generate PDF on server: ' + err.message);
+          this.disabled = false;
+          this.innerText = 'Download as PDF';
+        }).generateAndDownloadPDF(internId, domain);
+      });
+      document.getElementById("domainSelect").addEventListener("change", function () {
+
+        const selectedDomain = this.value;
+
+        CURRENT_DOMAIN = selectedDomain;
+        showLoading();
+        loadReport(CURRENT_INTERN_ID, selectedDomain);
+      });
+    </script>
+    <!-- 🔥 Loading Overlay -->
+    <div id="loadingOverlay" style="
+      display:none;
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      backdrop-filter: blur(4px);
+      background: rgba(0,0,0,0.3);
+      z-index:9999;
+      justify-content:center;
+      align-items:center;
+    ">
+
+      <div style="
+        background:white;
+        padding:20px 30px;
+        border-radius:12px;
+        text-align:center;
+        box-shadow:0 4px 20px rgba(0,0,0,0.2);
+      ">
+        <div class="spinner"></div>
+        <p style="margin-top:10px; font-weight:600;">Loading Report...</p>
+      </div>
+
+    </div>
+  </body>
+</html>

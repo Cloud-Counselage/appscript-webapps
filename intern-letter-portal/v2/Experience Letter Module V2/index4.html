@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Intern Project Status Checker & Experience Letter Downloader</title>
+<style>
+  /* Visual design matching your Web App 2 */
+  :root{
+  --navy:#273755;
+  --yellow:#FEC601;
+  --orange:#EA7317;
+  --light-bg:#f4f7f9;
+  --card:#ffffff;
+  --muted:#737373;
+  }
+
+  body {
+    font-family: Arial, sans-serif, inter, segoe UI;
+    background:var(--light-bg);
+    margin: 0;
+    padding: 24px;
+    color: #222;
+  }
+  .header-logos {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .header-logos img { height: 90px; width: auto; }
+  .header-logos .iac-center { height: 100px; align-self: center; }
+
+  .title { text-align: center; font-size: 30px; font-weight: 800; margin: 12px 0 22px 0; color: var(--navy) }
+
+  .container {
+    max-width: 760px;
+    margin: auto;
+    background:var(--card);
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 14 40px rgba(39,55,85,0.12);
+  }
+  .instructions {
+    text-align: left;
+    background: #fff9e6;
+    padding: 16px;
+    border-left: 5px solid var(--orange);
+    margin-bottom: 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    color: var(--muted)
+  }
+  .instructions a{
+    color: var(--orange)
+  } 
+
+  #internId { width: 100%; padding: 13px; font-size: 15px; margin-top: 6px; box-sizing: border-box; border-radius: 10px; border: 1px solid #d6dceb; outline: none }
+  #internId focus{
+    border-color: var(--navy);
+    box-shadow: 0 0 0 2px rgba(39,55,85,0.15);
+
+  }
+
+  button.searchBtn {
+    width: 100%;
+    padding: 13px;
+    margin-top: 14px;
+    background-color: var(--navy);
+    color:var(--card);
+    border: none;
+    cursor: pointer;
+    border-radius: 12px;
+    font-size: 16px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+  }
+  button.searchBtn:hover { background-color: #1f2d45; }
+  button.searchBtn[disabled] { opacity:0.6; cursor:not-allowed; }
+
+  #result { margin-top: 18px; text-align: left; }
+  .card { margin-bottom: 14px; padding: 14px; border: 1px solid #e0e0e0; border-radius: 12px; background: #f9fbff; border-left:4px solid var(--navy); font-size: 14px; }
+  .no-result { color: var(--orange); font-weight: 600; text-align:center; padding:14px; }
+  .loading { color:var(--orange); text-align:center; padding:14px; font-weight:600; }
+
+  .downloadBtn {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 11px 16px;
+    border-radius: 10px;
+    background:var(--yellow);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .downloadBtn:hover{
+   background:#25724a;
+  }
+  .downloadBtn.hidden { display:none; }
+  .downloadBtn[disabled] { opacity:0.6; cursor:not-allowed; }
+
+  .spinner { width:16px; height:16px; border-radius:50%; border:3px solid rgba(255,255,255,0.3); border-left-color: #fff; animation: spin 900ms linear infinite; display:inline-block; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  @media (max-width:600px) {
+    .title { font-size: 28px; }
+    .header-logos { flex-direction: column; align-items: center; }
+    .header-logos img { height: 70px; }
+  }
+</style>
+</head>
+<body>
+  <div class="header-logos">
+    <img src="https://raw.githubusercontent.com/Cloud-Counselage/GPI-Students-status/refs/heads/main/ccpl_logo.png" alt="CCPL Logo">
+    <img src="https://raw.githubusercontent.com/Cloud-Counselage/GPI-Students-status/refs/heads/main/iac_Logo.png" alt="IAC Logo" class="iac-center">
+    <img src="https://raw.githubusercontent.com/Cloud-Counselage/GPI-Students-status/refs/heads/main/gac_foundation_logo.png" alt="GAC Foundation Logo">
+  </div>
+
+  <div class="title">Intern Project Status Checker & Experience Letter Downloader</div>
+
+  <div class="container">
+    <div class="instructions">
+      <h3>Instructions:</h3>
+      <ul>
+        <li><b>Record Not Found:</b> If your record isn’t found after submission, please wait for some time.</li>
+        <li><b>Recent Submissions:</b> If you submitted your project within the last month, it is still being processed. You will receive an email about your project status.</li>
+        <li><b>Check Your Email:</b> If you don’t see any email from <a href="mailto:member@industryacademiacommunity.com"><b>member@industryacademiacommunity.com</b></a>, please check your spam/junk folder. If it’s still not found, email us and we will resend it.</li>
+        <li><b>🔗 Submission Link:</b> <a href="https://tinyurl.com/mwtwa7uw" target="_blank">https://tinyurl.com/mwtwa7uw</a></li>
+      </ul>
+    </div>
+
+    <input id="internId" placeholder="Enter your Intern ID (e.g. IP23-000123 or IP -00001)" />
+    <button class="searchBtn" id="searchBtn">
+      <span id="searchText">Search</span>
+      <span id="searchSpinner" style="display:none;" class="spinner" aria-hidden="true"></span>
+    </button>
+
+    <div id="result"></div>
+  </div>
+
+<script>
+/* Helpers */
+function normKey(s){ if(!s && s!==0) return ""; return String(s).toLowerCase().replace(/[^a-z0-9]/g,''); }
+function escapeHtml(str){ if(str===null||str===undefined) return ""; return String(str).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
+function normalizeInputId(str){ if(str===null||str===undefined) return ""; return String(str).replace(/[\s\-]+/g,'').toUpperCase(); }
+function isYesVal(v){ if(!v && v!==0) return false; var t = String(v).trim().toLowerCase(); return t==='yes' || t==='y' || t==='true' || t==='1'; }
+function isVerifiedVal(v){ if(!v && v!==0) return false; var t = String(v).trim().toLowerCase(); return t==='verified' || t==='v' || t==='yes' || t==='true'; }
+
+/* DOM */
+const searchBtn = document.getElementById('searchBtn');
+const searchText = document.getElementById('searchText');
+const searchSpinner = document.getElementById('searchSpinner');
+const internInput = document.getElementById('internId');
+const resultDiv = document.getElementById('result');
+
+function setSearching(on){
+  if(on){
+    searchSpinner.style.display = 'inline-block';
+    searchText.style.display = 'none';
+    searchBtn.disabled = true;
+  } else {
+    searchSpinner.style.display = 'none';
+    searchText.style.display = 'inline';
+    searchBtn.disabled = false;
+  }
+}
+function showLoading(msg){ resultDiv.innerHTML = '<div class="loading">' + escapeHtml(msg) + '</div>'; }
+function showError(msg){ resultDiv.innerHTML = '<div class="no-result">' + escapeHtml(msg) + '</div>'; }
+function clearResults(){ resultDiv.innerHTML = ''; }
+
+/* find header (client-side) used to match friendly labels on returned data keys */
+function findHeader(dataObj, friendly){
+  var target = normKey(friendly);
+  for(var k in dataObj){
+    if(normKey(k) === target) return k;
+  }
+  for(var k2 in dataObj){
+    var nk = normKey(k2);
+    if(nk.indexOf(target) !== -1 || target.indexOf(nk) !== -1) return k2;
+  }
+  var parts = (friendly||'').toLowerCase().match(/[a-z0-9]+/g) || [];
+  for(var k3 in dataObj){
+    var nk2 = normKey(k3);
+    var matchCount = 0;
+    for(var p=0;p<parts.length;p++){
+      if(parts[p] && nk2.indexOf(parts[p]) !== -1) matchCount++;
+    }
+    if(matchCount >= 1) return k3;
+  }
+  return null;
+}
+
+/* render a single record card (one per domain/row) */
+function renderRecordCard(record, idx, internId){
+  var data = record.data || {};
+  var html = '<div class="card" data-row-index="' + record.rowIndex + '">';
+  var friendlyLabels = ["Intern ID","Name","College/ University Name","Domain Name","Verification Status","Final Project Checking Result","Final Status"];
+  friendlyLabels.forEach(function(label){
+    var key = findHeader(data, label);
+    if(key && data[key] !== undefined && data[key] !== null && String(data[key]).trim() !== ""){
+      html += '<div><b>' + label + ':</b> ' + escapeHtml(data[key]) + '</div>';
+    }
+  });
+  html += '</div>';
+  return html;
+}
+
+/* create download button element for a record (returns DOM element) */
+function createDownloadButton(record, internId){
+  var data = record.data || {};
+  var considerKey = findHeader(data, "Consider for Experience Letter") || findHeader(data, "Consider for experience");
+  var verifyKey = findHeader(data, "Verification Status") || findHeader(data, "Verification");
+  var considerVal = considerKey ? data[considerKey] : "";
+  var verifyVal = verifyKey ? data[verifyKey] : "";
+  var allow = isYesVal(considerVal) && isVerifiedVal(verifyVal);
+
+  var wrapper = document.createElement('div');
+  wrapper.style.textAlign = "center";
+  wrapper.style.marginTop = "8px";
+
+  var btn = document.createElement('button');
+  btn.className = 'downloadBtn';
+  btn.textContent = 'Download Experience Letter';
+  btn.dataset.rowIndex = record.rowIndex;
+  btn.dataset.internId = internId;
+  if(!allow){
+    btn.classList.add('hidden');
+    btn.disabled = true;
+  } else {
+    btn.classList.remove('hidden');
+    btn.disabled = false;
+  }
+  wrapper.appendChild(btn);
+
+  // reason note if not allowed
+  if(!allow){
+    var reasons = [];
+    if(!isYesVal(considerVal)) reasons.push("Consider for Experience Letter should be 'Yes'");
+    if(!isVerifiedVal(verifyVal)) reasons.push("Verification Status should be 'Verified'");
+    var note = document.createElement('div');
+    note.className = 'card';
+    note.style.marginTop = '6px';
+    note.innerHTML = '<b>Download not allowed:</b> ' + escapeHtml(reasons.join(' & '));
+    wrapper.appendChild(note);
+  } /*else {
+    // optionally warn if project status not accepted (server may still reject)
+    if((record.projectStatusNormalized || '').toLowerCase() !== 'accepted'){
+      var warn = document.createElement('div');
+      warn.className = 'card';
+      warn.style.marginTop = '6px';
+      warn.innerHTML = '<b>Note:</b> You are eligible and verified; actual generation requires project status to be \'Accepted\'. Generation may still be blocked if project status is not Accepted.';
+      wrapper.appendChild(warn);
+    }
+  }*/
+
+  // attach click
+  btn.addEventListener('click', function(){
+    if(btn.disabled) return;
+    // show per-button spinner
+    var origText = btn.textContent;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner" aria-hidden="true"></span> Generating...';
+    // call server with internId and rowIndex
+    var ridx = btn.dataset.rowIndex;
+    google.script.run.withSuccessHandler(function(out){
+      btn.disabled = false;
+      btn.textContent = origText;
+      if(!out || out.ok === false){
+        var msg = (out && (out.userMessage || out.message)) ? (out.userMessage || out.message) : 'Failed to generate the experience letter.';
+        // show error card below
+        var err = document.createElement('div');
+        err.className = 'card';
+        err.innerHTML = '<b>Error:</b> ' + escapeHtml(msg);
+        wrapper.appendChild(err);
+        return;
+      }
+      try {
+        var a = document.createElement('a');
+        a.href = "data:application/pdf;base64," + out.pdf;
+        a.download = out.filename || ("Experience_Letter_" + internId + ".pdf");
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        var ok = document.createElement('div');
+        ok.className = 'card';
+        ok.innerHTML = '<b>Success:</b> Experience letter generated and download started.';
+        wrapper.appendChild(ok);
+      } catch(e){
+        var err2 = document.createElement('div');
+        err2.className = 'card';
+        err2.innerHTML = '<b>Error:</b> Generation succeeded but download failed in browser.';
+        wrapper.appendChild(err2);
+      }
+    }).withFailureHandler(function(err){
+      btn.disabled = false;
+      btn.textContent = origText;
+      var errDiv = document.createElement('div');
+      errDiv.className = 'card';
+      errDiv.innerHTML = '<b>Error:</b> ' + escapeHtml(err && err.message ? err.message : String(err));
+      wrapper.appendChild(errDiv);
+    }).generateExperienceLetter(btn.dataset.internId, ridx);
+  });
+
+  return wrapper;
+}
+
+/* handle server response and render multiple records */
+function handleSearchResponse(res){
+  if(!res || res.ok === false){
+    showError(res && res.message ? res.message : "Intern ID not found.");
+    return;
+  }
+  clearResults();
+  var internId = res.internId || internInput.value.trim();
+  var records = res.records || [];
+  if(!records.length){
+    showError("No records found for Intern ID: " + internId);
+    return;
+  }
+
+  // Render each record card + per-record download button
+  records.forEach(function(rec, idx){
+    var html = renderRecordCard(rec, idx, internId);
+    var wrapper = document.createElement('div');
+    wrapper.innerHTML = html;
+    resultDiv.appendChild(wrapper);
+    var downloadWrapper = createDownloadButton(rec, internId);
+    resultDiv.appendChild(downloadWrapper);
+  });
+}
+
+/* Main search function */
+function doSearch(){
+  clearResults();
+  var raw = internInput.value.trim();
+  if(!raw){ showError("Please enter an Intern ID."); return; }
+  showLoading("Searching records...");
+  setSearching(true);
+  google.script.run.withSuccessHandler(function(res){
+    setSearching(false);
+    handleSearchResponse(res);
+  }).withFailureHandler(function(err){
+    setSearching(false);
+    showError("Error: " + (err && err.message ? err.message : String(err)));
+  }).checkStatus(raw);
+}
+
+/* events */
+searchBtn.addEventListener('click', doSearch);
+internInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') doSearch(); });
+
+</script>
+</body>
+</html>

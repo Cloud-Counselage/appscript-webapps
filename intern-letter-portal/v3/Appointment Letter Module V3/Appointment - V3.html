@@ -1,0 +1,870 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GPI New Joinee Form</title>
+  <style>
+    :root { --brand:#0b66c3; --ok:#2e8b57; --blue:#3DA5D9; --navy:#273755; --yellow:#FEC601; --orange:#EA7317; --success:#2E8B57; --card:#FFFFFF; --text:#333333;  --muted:#737373; --border:#E0E0E0; --bg:#FFFFFF; }
+    body{
+      font-family:Inter,Segoe UI,Arial;
+      background:var(--bg);
+      margin:0;
+      padding:30px;
+      display:flex;
+      justify-content:center;
+    }
+    .card{
+      width:480px;
+      background:var(--card);
+      padding:22px;
+      border-radius:18px;
+      box-shadow:0 14px 40px rgba(39,55,85,0.12);
+      max-height:90vh;
+      overflow-y:auto;
+    }
+    h2{
+      margin:0 0 10px;
+      text-align:center;
+      color:var(--navy);
+      font-weight:800;
+      letter-spacing:0.3px;
+    }
+    p.intro{
+      font-size:13px;
+      color:var(--muted);
+      margin:0 0 15px;
+      text-align:center;
+    }
+    label{
+      display:block;
+      margin-top:12px;
+      font-weight:600;
+      color:var(--text);
+      font-size:13px;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="file"],
+    textarea{
+      width:100%;
+      padding:10px;
+      margin-top:6px;
+      border-radius:8px;
+      border:1px solid var(--border);
+      box-sizing:border-box;
+    }
+    textarea{
+      resize:vertical;
+      min-height:70px;
+    }
+    button{
+      background:var(--navy);
+      color:#fff;
+      padding:11px;
+      border:none;
+      width:100%;
+      border-radius:8px;
+      font-weight:700;
+      margin-top:14px;
+      cursor:pointer;
+    }
+    button[disabled]{
+      opacity:0.6;
+      cursor:not-allowed;
+    }
+    #message{
+      margin-top:14px;
+      text-align:center;
+      font-weight:700;
+      padding:12px;
+      border-radius:8px;
+      display:none;
+    }
+    #download{
+      display:none;
+      margin-top:10px;
+      background:var(--yellow);
+    }
+    small.note{
+      display:block;
+      margin-top:6px;
+      color:#666;
+    }
+    .note{
+      color:var(--muted);
+    }
+
+    /* Email alert card below email field */
+    #emailAlert{
+      margin-top:8px;
+      padding:10px;
+      border-radius:8px;
+      border:1px solid var(--yellow);
+      background:#FFF6D6;
+      font-size:12px;
+      color:#7a4b00;
+      display:none;
+    }
+    #emailAlertMessage{
+      font-weight:600;
+      margin-bottom:6px;
+    }
+    .email-alert-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+    }
+    .email-inline-btn{
+      background:var(--orange);
+      color:#fff;
+      border:none;
+      border-radius:6px;
+      padding:7px 10px;
+      font-size:11px;
+      font-weight:600;
+      cursor:pointer;
+      width:auto;
+      margin-top:0;
+    }
+    .email-inline-btn.secondary{
+      background:var(--navy);
+    }
+
+    /* previous / new file view box */
+    .prev-file-box{
+      margin-top:8px;
+      background:#F1F8FD; /* light blue */
+      padding:10px;
+      border-radius:8px;
+      border-left:4px solid var(--navy);
+    }
+    .prev-file-label{
+      display:block;
+      font-size:12px;
+      color:#333;
+      margin-bottom:4px;
+      font-weight:600;
+    }
+    .prev-file-name{
+      font-size:12px;
+      color:#222;
+      margin-bottom:6px;
+      word-break:break-all;
+    }
+    .prev-file-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+    }
+    .prev-file-link{
+      font-size:12px;
+      color:#FFFFFF;
+      font-weight:600;
+      text-decoration:none;
+      padding:4px 10px;
+      border-radius:4px;
+      background:var(--navy);
+      display:inline-block;
+    }
+    .prev-file-link:hover{
+      background:#1f2d45;
+    }
+    .prev-file-change-btn{
+      background:var(--yellow);
+      color:#fff;
+      border:none;
+      border-radius:4px;
+      padding:5px 10px;
+      font-size:11px;
+      font-weight:600;
+      cursor:pointer;
+    }
+    .email-inline-btn.primary-download{
+      background:#0b66c3;
+      font-size:12px;
+      padding:10px 14px;
+      border-radius:8px;
+      width:100%;
+      text-align:center;
+    }
+
+    .prev-file-change-btn:hover{
+      opacity:0.92;
+      background:#e6b700;
+    }
+    select{
+      width:100%;
+      padding:11px 40px 11px 12px;
+      margin-top:6px;
+      border-radius:10px;
+      border:1.5px solid #d6dceb;
+      background-color:#fff;
+      font-size:14px;
+      font-weight:500;
+      color:#333;
+      cursor:pointer;
+
+      appearance:none;
+      -webkit-appearance:none;
+      -moz-appearance:none;
+
+      background-image:
+       linear-gradient(45deg, transparent 50%, #273755 50%),
+       linear-gradient(135deg, #273755 50%, transparent 50%);
+      background-position:
+       calc(100% - 18px) 50%,
+       calc(100% - 12px) 50%;
+
+      background-size:6px 6px, 6px 6px;
+      background-repeat:no-repeat;
+      transition:border-color .2s ease, box-shadow .2s ease;
+    }
+    select:hover{
+      border-color:#3DA5D9;
+    }
+    .intro{
+      text-align: left;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .intro b{
+      color: var(--navy)
+    }
+    .intro a{
+      color: var(--navy)
+    }
+    select:focus{
+     outline:none;
+     border-color:#273755;
+     box-shadow:0 0 0 3px rgba(61,165,217,0.25);
+    }  
+    select:disabled{
+     background:#f5f6f8;
+     color:#999;
+     cursor:not-allowed;
+}
+
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>GPI New Joinee Form</h2>
+    <p class="intro">
+      This form is a <b>pre-requisite</b> to enable us to issue your <b>Appointment Letter</b>.   
+      It helps us gather your basic information and ensures that you understand the <b>benefits, policies, and procedures</b> of this internship. 
+      <br><br>
+      The <b>domain selection</b> field helps us understand your preference. You may, however, change your domain later as per the program guidelines.
+      <br><br>
+      Your personal information and uploaded documents are protected under the company 
+      <a href="https://tinyurl.com/yc5rh3ek" target="_blank"><b>Privacy Policy</b></a>.
+      <br><br>
+      Should there be any concerns or require further clarification, please feel free to write to 
+      <a href="mailto:member@industryacademiacommunity.com"><b>member@industryacademiacommunity.com</b></a> 
+      or drop a message in the
+       <a href="https://tinyurl.com/5f4bjhwd" target="_blank"><b>IAC Community Chatroom</b></a>.
+    </p>
+
+    <form id="form">
+      <label>Full Name</label>
+      <input id="name" type="text" required />
+
+      <label>Email Address</label>
+      <input id="email" type="email" required />
+
+      <!-- inline email alert card -->
+      <div id="emailAlert">
+        <div id="emailAlertMessage"></div>
+        <div class="email-alert-actions" id="emailAlertActions">
+          <button type="button" id="emailAlertDownload" class="email-inline-btn primary-download">
+            Download Appointment Letter
+          </button>
+          
+        </div>
+      </div>
+
+      <!-- Questions -->
+      <label>What is your motivation to choose this internship?</label>
+      <select id="motivation" required>
+        <option value="">--Select--</option>
+        <option>This internship is part of my academics</option>
+        <option>Trying to explore a career option</option>
+        <option>Trying to implement my learning</option>
+        <option>Want to work on live projects</option>
+        <option>Want to learn industry ways of working</option>
+        <option>This will help me to get a high paying job</option>
+        <option>Others</option>
+      </select>
+
+      <label>Preferred timings for weekly meetings</label>
+      <select id="meetingTime" required>
+        <option value="">--Select--</option>
+        <option>Weekdays First half (11:00 am - 1:00 pm)</option>
+        <option>Weekdays Second half (4:00 pm - 6:00 pm)</option>
+        <option>Weekdays late evening (6:00 pm - 8:00 pm)</option>
+        <option>Saturday First half (11:00 am - 1:00 pm)</option>
+        <option>Saturday Second half (4:00 pm - 6:00 pm)</option>
+        <option>Saturday late evening (6:00 pm - 8:00 pm)</option>
+        <option>Sunday First half (11:00 am - 1:00 pm)</option>
+      </select>
+
+      <label>The pre-enrolment information was clear</label>
+      <select id="preEnrol" required>
+        <option value="">--Select--</option>
+        <option>Strongly Agree</option>
+        <option>Agree</option>
+        <option>Neutral</option>
+        <option>Disagree</option>
+        <option>Strongly Disagree</option>
+      </select>
+
+      <label>The enrolment process was simple</label>
+      <select id="enrolProcess" required>
+        <option value="">--Select--</option>
+        <option>Strongly Agree</option>
+        <option>Agree</option>
+        <option>Neutral</option>
+        <option>Disagree</option>
+        <option>Strongly Disagree</option>
+      </select>
+
+      <label>The induction session was informative</label>
+      <select id="inductionInfo" required>
+        <option value="">--Select--</option>
+        <option>Strongly Agree</option>
+        <option>Agree</option>
+        <option>Neutral</option>
+        <option>Disagree</option>
+        <option>Strongly Disagree</option>
+      </select>
+
+      <label>The induction provided knowledge of whom to contact</label>
+      <select id="inductionContact" required>
+        <option value="">--Select--</option>
+        <option>Strongly Agree</option>
+        <option>Agree</option>
+        <option>Neutral</option>
+        <option>Disagree</option>
+        <option>Strongly Disagree</option>
+      </select>
+
+      <label>Cloud Counselage & Gift-A-Career showed interest in my career</label>
+      <select id="careerSupport" required>
+        <option value="">--Select--</option>
+        <option>Strongly Agree</option>
+        <option>Agree</option>
+        <option>Neutral</option>
+        <option>Disagree</option>
+        <option>Strongly Disagree</option>
+      </select>
+
+      <label>What are your expectations from the Internship Program?</label>
+      <textarea id="expectations" required></textarea>
+
+      <label>Preferences & Suggestions (Webinar topics, Improvements, etc.)</label>
+      <textarea id="suggestions" required></textarea>
+
+      <!-- Instructions before passport -->
+      <p class="note" style="font-weight:600; background:#fff9e6; padding:10px; border-radius:8px; border:1px solid #f0dca8;">
+        Instructions (Please read carefully)<br>
+        1. Please provide a professional photograph that can be used for announcement of any recognitions that you might get.<br>
+        2. You need to provide Aadhar card from UIDAI Website (Should not be password protected). You may refer 'Aadhar Card Download Guide' pdf provided in the introduction section and your pdf name as 'AadharCard_FirstName_LastName'.<br>
+        3. Please upload your latest marksheet in the pdf format with name as 'Acad.Docs_FirstName_LastName'.<br>
+        4. Ensure the documents are clear, legible, and of high quality.<br>
+        5. Please ensure all documents are your own. Do not upload documents belonging to anyone else.
+      </p>
+
+      <!-- Uploads -->
+      <label>Passport Size Photograph</label>
+      <input id="passport" type="file" accept="image/*" required />
+      <small class="note">PNG/JPG recommended, max 5MB.</small>
+      <div id="passportPrev" class="prev-file-box" style="display:none;">
+        <span id="passportPrevLabel" class="prev-file-label">Previously uploaded:</span>
+        <div id="passportPrevName" class="prev-file-name"></div>
+        <div class="prev-file-actions">
+          <a id="passportPrevLink" href="#" target="_blank" class="prev-file-link">View file</a>
+          <button type="button" id="passportChangeBtn" class="prev-file-change-btn">Change file</button>
+        </div>
+      </div>
+
+      <label>Aadhaar Number</label>
+      <input id="aadhaarNumber" type="text" pattern="\d{12}" maxlength="12" required />
+      <small class="note">Enter 12-digit Aadhaar Number, non-masked</small>
+
+      <label>Aadhaar Card (image)</label>
+      <input id="aadhaar" type="file" accept="image/*" required />
+      <small class="note">Kindly provide non-masked photo of Aadhaar Card containing all the details</small>
+      <div id="aadhaarPrev" class="prev-file-box" style="display:none;">
+        <span id="aadhaarPrevLabel" class="prev-file-label">Previously uploaded:</span>
+        <div id="aadhaarPrevName" class="prev-file-name"></div>
+        <div class="prev-file-actions">
+          <a id="aadhaarPrevLink" href="#" target="_blank" class="prev-file-link">View file</a>
+          <button type="button" id="aadhaarChangeBtn" class="prev-file-change-btn">Change file</button>
+        </div>
+      </div>
+
+      <label>Latest Academic Marksheet (image or PDF)</label>
+      <input id="marksheet" type="file" accept="image/*,application/pdf" required />
+      <div id="marksheetPrev" class="prev-file-box" style="display:none;">
+        <span id="marksheetPrevLabel" class="prev-file-label">Previously uploaded:</span>
+        <div id="marksheetPrevName" class="prev-file-name"></div>
+        <div class="prev-file-actions">
+          <a id="marksheetPrevLink" href="#" target="_blank" class="prev-file-link">View file</a>
+          <button type="button" id="marksheetChangeBtn" class="prev-file-change-btn">Change file</button>
+        </div>
+      </div>
+
+      <!-- Consent -->
+      <label>
+        <input type="checkbox" id="consent" required />
+        I hereby confirm that the information provided by me is correct and can be saved by Cloud Counselage Pvt. Ltd. in the database for official records as may be required for any future verifications.
+      </label>
+
+      <p class="note">Kindly check and review all the details before proceeding ahead with generating the appointment letter. Once you confirm that all details are correct, please proceed to generate the appointment letter.</p>
+
+      <button id="submitBtn" type="submit">Generate Appointment Letter</button>
+      <div id="message"></div>
+      <button id="download" type="button">Download Appointment Letter</button>
+    </form>
+  </div>
+
+  <script>
+    const USER_EMAIL = "<?= email ?>";
+    window.addEventListener("DOMContentLoaded", function () {
+    const emailInput = document.getElementById("email");
+    if (emailInput && USER_EMAIL) {
+      emailInput.value = USER_EMAIL;
+      emailInput.readOnly = true;
+    }
+  });
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = err => reject(err);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function extractFileNameFromUrl(url) {
+  try {
+    const decoded = decodeURIComponent(url);
+    const match = decoded.match(/\/([^\/]+\.pdf|[^\/]+\.(jpg|jpeg|png|pdf))/i);
+    if (match) return match[1];
+  } catch (e) {}
+  return "Document";
+}
+
+
+    // clear previous/new file boxes + restore file inputs
+    function clearFileViewLinks() {
+      const configs = [
+        {box:"passportPrev", label:"passportPrevLabel", name:"passportPrevName", link:"passportPrevLink", input:"passport"},
+        {box:"aadhaarPrev", label:"aadhaarPrevLabel", name:"aadhaarPrevName", link:"aadhaarPrevLink", input:"aadhaar"},
+        {box:"marksheetPrev", label:"marksheetPrevLabel", name:"marksheetPrevName", link:"marksheetPrevLink", input:"marksheet"}
+      ];
+      configs.forEach(c => {
+        const boxEl = document.getElementById(c.box);
+        const labelEl = document.getElementById(c.label);
+        const nameEl = document.getElementById(c.name);
+        const linkEl = document.getElementById(c.link);
+        const inputEl = document.getElementById(c.input);
+        if (boxEl) boxEl.style.display = "none";
+        if (labelEl) labelEl.textContent = "Previously uploaded:";
+        if (nameEl) nameEl.textContent = "";
+        if (linkEl) {
+          linkEl.href = "#";
+          linkEl.textContent = "View file";
+        }
+        if (inputEl) {
+          inputEl.style.display = "";
+          inputEl.required = true;
+        }
+      });
+    }
+
+    // show previous file links from Drive for edit mode
+    function setFileViewLinksFromData(data) {
+      clearFileViewLinks();
+      if (!data) return;
+
+      if (data.passportLink) {
+        const input = document.getElementById("photograph");
+        const box = document.getElementById("photographPrev");
+        const label = document.getElementById("photographPrevLabel");
+        const nameEl = document.getElementById("photographPrevName");
+        const link = document.getElementById("photographLink");
+        if (label) label.textContent = "Previously uploaded:";
+        if (nameEl) nameEl.textContent = extractFileNameFromUrl(data.passportLink);
+        if (link) {
+          link.href = data.passportLink;
+          link.textContent = "View file";
+        }
+        if (box) box.style.display = "block";
+        if (input) {
+          input.style.display = "none";
+          input.required = false;
+        }
+      }
+
+      if (data.aadhaarLink) {
+        const input = document.getElementById("aadhaar");
+        const box = document.getElementById("aadhaarPrev");
+        const label = document.getElementById("aadhaarPrevLabel");
+        const nameEl = document.getElementById("aadhaarPrevName");
+        const link = document.getElementById("aadhaarPrevLink");
+        if (label) label.textContent = "Previously uploaded:";
+        if (nameEl) nameEl.textContent = extractFileNameFromUrl(data.aadhaarLink);
+        if (link) {
+          link.href = data.aadhaarLink;
+          link.textContent = "View file";
+        }
+        if (box) box.style.display = "block";
+        if (input) {
+          input.style.display = "none";
+          input.required = false;
+        }
+      }
+
+      if (data.marksheetLink) {
+        const input = document.getElementById("marksheet");
+        const box = document.getElementById("marksheetPrev");
+        const label = document.getElementById("marksheetPrevLabel");
+        const nameEl = document.getElementById("marksheetPrevName");
+        const link = document.getElementById("marksheetPrevLink");
+        if (label) label.textContent = "Previously uploaded:";
+        if (nameEl) nameEl.textContent = extractFileNameFromUrl(data.marksheetLink);
+        if (link) {
+          link.href = data.marksheetLink;
+          link.textContent = "View file";
+        }
+        if (box) box.style.display = "block";
+        if (input) {
+          input.style.display = "none";
+          input.required = false;
+        }
+      }
+    }
+
+    // when user selects new file, override box to show "Selected file" + local preview
+    function setupFileInputPreview(inputId, boxId, labelId, nameId, linkId, typeLabel) {
+      const input = document.getElementById(inputId);
+      const box = document.getElementById(boxId);
+      const label = document.getElementById(labelId);
+      const nameEl = document.getElementById(nameId);
+      const link = document.getElementById(linkId);
+      if (!input || !box || !label || !nameEl || !link) return;
+
+      input.addEventListener("change", () => {
+        const file = input.files && input.files[0];
+        if (!file) return;
+
+        const url = URL.createObjectURL(file);
+        label.textContent = "Selected file (will replace previous after submission):";
+        nameEl.textContent = file.name;
+        link.textContent = "Preview selected " + typeLabel;
+        link.href = url;
+        link.target = "_blank";
+        box.style.display = "block";
+        input.style.display = "none";
+      });
+    }
+
+    // change file button handler → triggers hidden file input
+    function setupChangeButton(inputId, btnId) {
+      const input = document.getElementById(inputId);
+      const btn = document.getElementById(btnId);
+      if (!input || !btn) return;
+      btn.addEventListener("click", () => {
+        input.click();
+      });
+    }
+
+    // helper: fill form fields from backend data (previous submission)
+    function fillFormFromData(data) {
+      if (!data) return;
+      if (data.name !== undefined) document.getElementById("name").value = data.name || "";
+      if (data.email !== undefined) document.getElementById("email").value = data.email || "";
+      if (data.motivation !== undefined) document.getElementById("motivation").value = data.motivation || "";
+      if (data.meetingTime !== undefined) document.getElementById("meetingTime").value = data.meetingTime || "";
+      if (data.preEnrol !== undefined) document.getElementById("preEnrol").value = data.preEnrol || "";
+      if (data.enrolProcess !== undefined) document.getElementById("enrolProcess").value = data.enrolProcess || "";
+      if (data.inductionInfo !== undefined) document.getElementById("inductionInfo").value = data.inductionInfo || "";
+      if (data.inductionContact !== undefined) document.getElementById("inductionContact").value = data.inductionContact || "";
+      if (data.careerSupport !== undefined) document.getElementById("careerSupport").value = data.careerSupport || "";
+      if (data.expectations !== undefined) document.getElementById("expectations").value = data.expectations || "";
+      if (data.suggestions !== undefined) document.getElementById("suggestions").value = data.suggestions || "";
+      if (data.aadhaarNumber !== undefined) document.getElementById("aadhaarNumber").value = data.aadhaarNumber || "";
+      if (data.consent !== undefined) document.getElementById("consent").checked = !!data.consent;
+
+      // show previous file cards for edit mode
+      setFileViewLinksFromData(data);
+    }
+
+    // helper: enable/disable whole form except email (for email checking)
+    function setFormInteractive(enabled) {
+      const form = document.getElementById("form");
+      const elements = form.querySelectorAll("input, select, textarea, button");
+      elements.forEach(el => {
+        if (el.id === "email") return;
+        el.disabled = !enabled;
+      });
+    }
+
+    // helper: hide entire form (all children except #message) and show thank-you message on top
+    function hideFormShowMessage(text, bgColor) {
+      const form = document.getElementById("form");
+      const msg = document.getElementById("message");
+
+      Array.from(form.children).forEach(child => {
+        if (child.id !== "message") {
+          child.style.display = "none";
+        }
+      });
+
+      msg.innerText = text;
+      msg.style.background = bgColor || "#e0f9ec";
+      msg.style.display = "block";
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // email blur handler: call checkEmailAndFetch
+    (function setupEmailChecker() {
+      const emailInput = document.getElementById("email");
+      const emailAlert = document.getElementById("emailAlert");
+      const emailAlertMessage = document.getElementById("emailAlertMessage");
+      const emailAlertActions = document.getElementById("emailAlertActions");
+      const emailAlertDownload = document.getElementById("emailAlertDownload");
+      
+      
+      const submitBtn = document.getElementById("submitBtn");
+
+      function hideEmailAlert() {
+        emailAlert.style.display = "none";
+        emailAlertMessage.textContent = "";
+        emailAlertActions.style.display = "none";
+        emailAlertDownload.onclick = null;
+        
+      }
+
+      emailInput.addEventListener("input", () => {
+        hideEmailAlert();
+        clearFileViewLinks();
+        // If user edits the email after a previous check, allow form input again
+        setFormInteractive(true);
+      });
+
+      emailInput.addEventListener("blur", () => {
+        const email = emailInput.value.trim();
+        if (!email) {
+          hideEmailAlert();
+          clearFileViewLinks();
+          return;
+        }
+
+        const basicPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!basicPattern.test(email)) {
+          hideEmailAlert();
+          clearFileViewLinks();
+          return;
+        }
+
+        emailAlertMessage.textContent = "Checking this email, please wait...";
+        emailAlertActions.style.display = "none";
+        emailAlert.style.display = "block";
+
+        // temporarily disable submit & other inputs while server check is in progress
+        submitBtn.disabled = true;
+        setFormInteractive(false);
+
+        google.script.run
+          .withSuccessHandler((res) => {
+            submitBtn.disabled = false;
+            // If server says email not found OR returned falsy, re-enable form for new entry
+            if (!res || !res.ok || !res.exists) {
+              hideEmailAlert();
+              clearFileViewLinks();
+              setFormInteractive(true); // <<-- IMPORTANT: re-enable form for new email
+              return;
+            }
+
+            // Existing email case: keep form disabled and show download + edit options
+            setFormInteractive(false);
+            emailAlertDownload.disabled = false;
+
+            emailAlertMessage.textContent =
+              res.message ||
+              ("This email already exists: " + email + ". You can download your appointment letter.");
+            emailAlertActions.style.display = "flex";
+            emailAlert.style.display = "block";
+            
+
+            // Download existing appointment letter
+            emailAlertDownload.onclick = () => {
+              if (!res.pdf) return;
+              const a = document.createElement("a");
+              a.href = "data:application/pdf;base64," + res.pdf;
+              if (res.internId) {
+                a.download = "Appointment_" + res.internId + ".pdf";
+              } else {
+                a.download = "Appointment_Letter.pdf";
+              }
+              a.click();
+              // 🔒 ADD THESE LINES
+              setFormInteractive(false);
+              document.getElementById("submitBtn").style.display = "none";
+
+              hideEmailAlert();
+              clearFileViewLinks();
+              hideFormShowMessage(
+                "Your appointment letter has been downloaded successfully. Thank you.",
+                "#e0f9ec"
+              );
+            };
+
+            
+
+          })
+          .withFailureHandler((err) => {
+            console.log("checkEmailAndFetch error:", err);
+            submitBtn.disabled = false;
+            setFormInteractive(true);
+            hideEmailAlert();
+          })
+          .checkEmailAndFetch(email);
+      });
+    })();
+
+    // setup file input preview + change buttons
+    setupFileInputPreview("passport", "passportPrev", "passportPrevLabel", "passportPrevName", "passportPrevLink", "photograph file");
+    setupFileInputPreview("aadhaar", "aadhaarPrev", "aadhaarPrevLabel", "aadhaarPrevName", "aadhaarPrevLink", "aadhaar file");
+    setupFileInputPreview("marksheet", "marksheetPrev", "marksheetPrevLabel", "marksheetPrevName", "marksheetPrevLink", "marksheet file");
+
+    setupChangeButton("passport", "passportChangeBtn");
+    setupChangeButton("aadhaar", "aadhaarChangeBtn");
+    setupChangeButton("marksheet", "marksheetChangeBtn");
+
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById("submitBtn");
+      const msg = document.getElementById("message");
+      const dl = document.getElementById("download");
+      msg.style.display = "none";
+      dl.style.display = "none";
+
+      submitBtn.disabled = true;
+      msg.innerText = "Submitting...";
+      msg.style.display = "block";
+      msg.style.background = "#eef";
+
+      try {
+        const passportFile = document.getElementById("passport").files[0];
+        const aadhaarFile = document.getElementById("aadhaar").files[0];
+        const marksheetFile = document.getElementById("marksheet").files[0];
+
+        const payload = {
+          name: document.getElementById("name").value,
+          email: document.getElementById("email").value,
+          aadhaarNumber: document.getElementById("aadhaarNumber").value,
+          motivation: document.getElementById("motivation").value,
+          meetingTime: document.getElementById("meetingTime").value,
+          preEnrol: document.getElementById("preEnrol").value,
+          enrolProcess: document.getElementById("enrolProcess").value,
+          inductionInfo: document.getElementById("inductionInfo").value,
+          inductionContact: document.getElementById("inductionContact").value,
+          careerSupport: document.getElementById("careerSupport").value,
+          expectations: document.getElementById("expectations").value,
+          suggestions: document.getElementById("suggestions").value,
+          consent: document.getElementById("consent").checked
+        };
+
+        const passport = passportFile ? [{
+          name: passportFile.name,
+          mimeType: passportFile.type,
+          data: await fileToBase64(passportFile)
+        }] : [];
+        const aadhaar = aadhaarFile ? [{
+          name: aadhaarFile.name,
+          mimeType: aadhaarFile.type,
+          data: await fileToBase64(aadhaarFile)
+        }] : [];
+        const marksheet = marksheetFile ? [{
+          name: marksheetFile.name,
+          mimeType: marksheetFile.type,
+          data: await fileToBase64(marksheetFile)
+        }] : [];
+
+        google.script.run
+          .withSuccessHandler((res) => {
+            submitBtn.disabled = false;
+
+            if (res.ok) {
+              if (res.message) {
+                msg.innerText = res.message;
+              } else if (res.existing) {
+                msg.innerText = "Your updated appointment letter has been generated successfully.";
+              } else {
+                msg.innerText = "Congratulations! Your appointment letter has been generated successfully.";
+              }
+
+              if (res.existing) {
+                msg.style.background = "#ffe9c7"; // updated letter
+              } else {
+                msg.style.background = "#e0f9ec"; // new letter
+              }
+              msg.style.display = "block";
+
+              if (res.pdf) {
+                dl.style.display = "block";
+                dl.textContent = res.existing
+                  ? "Download Updated Appointment Letter"
+                  : "Download Appointment Letter";
+
+                dl.onclick = () => {
+                  const a = document.createElement("a");
+                  a.href = "data:application/pdf;base64," + res.pdf;
+
+                  if (res.internId) {
+                    a.download = "Appointment_" + res.internId + ".pdf";
+                  } else {
+                    a.download = "Appointment_Letter.pdf";
+                  }
+
+                  a.click();
+                  setFormInteractive(false);
+                  submitBtn.style.display = "none";
+                   dl.disabled = true;
+                };
+              } else {
+                dl.style.display = "none";
+              }
+
+            } else {
+              msg.innerText = res.message || "Something went wrong. Please try again.";
+              msg.style.background = "#fdd";
+              msg.style.display = "block";
+              dl.style.display = "none";
+            }
+          })
+          .withFailureHandler((err) => {
+            submitBtn.disabled = false;
+            msg.innerText = "Error: " + (err && err.message ? err.message : err);
+            msg.style.background = "#fdd";
+            msg.style.display = "block";
+            dl.style.display = "none";
+          })
+          .submitForm(payload, passport, aadhaar, marksheet);
+
+      } catch (err) {
+        submitBtn.disabled = false;
+        msg.innerText = "Error: " + err.message;
+        msg.style.background = "#fdd";
+        msg.style.display = "block";
+      }
+    });
+  </script>
+</body>
+</html>

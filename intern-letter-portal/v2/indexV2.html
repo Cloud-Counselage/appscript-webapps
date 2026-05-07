@@ -1,0 +1,360 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Intern Letter Portal</title>
+
+  <style>
+    :root{                          
+      --navy:#273755;
+      --blue:#3DA5D9;
+      --yellow:#FEC601;
+      --orange:#EA7317;
+      /* Neutrals */
+      --bg:#FFFFFF;
+      --card:#FFFFFF;
+      --text:#333333;
+      --muted:#737373;
+      --primary:#0b66c3;
+      --secondary:#f39c12;
+      --bg:#f3f6fb;
+      --card:#ffffff;
+       --text:#333;
+    }
+    
+
+    body{
+      margin:0;
+      min-height:100vh;
+      background:linear-gradient(135deg,#eef4ff,#ffffff);
+      font-family:Inter,Segoe UI,Arial,sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+
+    .portal-card{
+      width:420px;
+      background:var(--card);
+      border-radius:18px;
+      box-shadow:0 14px 40px rgba(0,0,0,0.08);
+      padding:32px 26px 30px;
+      text-align:center;
+    }
+
+    .logo-wrap{ display:flex; justify-content:center; margin-bottom:18px; }
+    .logo-wrap img{ height:110px; object-fit:contain; }
+
+    h1{ margin:0 0 14px; font-size:28px; font-weight:800; color:var(--navy); }
+
+    .note{
+      font-size:13.5px;
+      color:var(--muted);
+      background:#eef6ff;
+      padding:12px 14px;
+      border-radius:10px;
+      border-left:4px solid var(--navy);
+      margin-bottom:18px;
+    }
+    .page-desc{
+      margin: 6px 0 18px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--muted);
+      text-align: center;
+    }
+    .page-desc b{
+      color: var(--navy);
+    }
+    .page-desc a{
+      color: var(--navy);
+      font-weight: 600;
+       text-decoration: none;
+    }
+    .page-desc a:hover{
+      text-decoration: underline;
+    }
+
+    label{ display:block; margin-top:16px; font-size:13px; font-weight:600; color:var(--text); text-align:left; }
+    input{ width:100%; margin-top:6px; padding:11px; border-radius:8px; border:1px solid #d6dceb; font-size:14px; }
+
+    button{ width:100%; margin-top:18px; padding:13px; border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; }
+    .btn-primary{ background:var(--navy); color:#fff; }
+    .btn-secondary{ background:var(--orange); color:#fff; }
+    button:hover{ opacity:0.95; }
+    button:disabled{ opacity:0.6; cursor:not-allowed; }
+
+    #message{ display:none; margin-top:16px; padding:12px; border-radius:8px; font-weight:600; text-align:center; }
+
+    #dashboard{ display:none; }
+    .welcome{ font-size:15px; font-weight:700; color:#444; margin-bottom:12px; }
+    .important-note{ font-size:13.5px; background:#eef6ff; color:#555; padding:14px; border-radius:10px; border-left:4px solid var(--navy); margin-bottom:20px; text-align:left; }
+    .app-btn{ margin-top:14px; }
+    .company-link{ margin-top:22px; font-size:12px; }
+    .company-link a{ color:var(--navy); text-decoration:none; font-weight:600; }
+    .company-link a:hover{ text-decoration:underline; }
+
+    /* Modal */
+    .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:9999; }
+    .modal { width:360px; background:#fff; border-radius:12px; padding:18px; box-shadow:0 10px 30px rgba(0,0,0,0.15); text-align:left; }
+    .modal h3 { margin:0 0 10px; color:var(--blue); }
+    .modal p { margin:0 0 14px; color:#333; font-weight:600; }
+    .modal .actions { display:flex; gap:8px; justify-content:flex-end; margin-top:8px; }
+    .modal .btn { padding:10px 12px; border-radius:8px; font-weight:700; border:none; cursor:pointer; }
+    .modal .btn.primary { background:var(--blue); color:#fff; }
+    .modal .btn.ghost { background:#f1f1f1; color:#333; }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="portal-card">
+
+    <!-- HEADER -->
+    <div class="logo-wrap">
+      <img src="https://media.licdn.com/dms/image/v2/C4E0BAQGSSw6BJ10Tbw/company-logo_200_200/company-logo_200_200/0/1644811039724?e=2147483647&v=beta&t=ufWJVs4GUMDiZcpuzS3ePKgB1ERK1bUKj-UPVpRBwS4" alt="Cloud Counselage Logo">
+    </div>
+
+    <h1>Intern Letter Portal</h1>
+    <p class="page-desc">
+      This app enables you to generate your official Appointment Letter and 
+      Experience Letter for the <b>Global Professional Internship</b>.
+      <br><br>
+      Should you face any difficulty while generating the letters, please
+      write to
+       <a href="mailto:member@industryacademiacommunity.com">
+        member@industryacademiacommunity.com
+       </a>
+       or drop a message in the
+       <a href="https://tinyurl.com/5f4bjhwd" target="_blank">IAC Community Chatroom</a>.
+    </p>
+
+    <div class="note" id="loginNote">
+      Kindly use the <b>same Email ID</b> and <b>Mobile Number</b> that you submitted while filling up the IAC Profile Form.
+    </div>
+
+    <!-- LOGIN -->
+    <div id="loginBox">
+      <label>Username (Email ID)</label>
+      <input type="email" id="email" placeholder="Enter registered email">
+
+      <label>Password (Mobile Number)</label>
+      <input type="password" id="mobile" placeholder="Enter registered mobile number">
+
+      <button class="btn-primary" onclick="login()">Sign In</button>
+    </div>
+
+    <div id="message"></div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboard">
+      <div class="welcome" id="welcomeText"></div>
+
+      <div class="important-note" id="postLoginNote">
+        Kindly note that once the letter is generated, it <b>cannot be edited</b>.  
+        Please ensure that you provide accurate information in all the respective fields.
+      </div>
+
+      <button id="appointmentBtn" class="btn-primary app-btn" onclick="openAppointmentApp()">
+        Generate Appointment Letter 
+      </button>
+
+      <button id="experienceBtn" class="btn-secondary app-btn" onclick="openExperienceApp()" disabled>
+        Generate Experience Letter
+      </button>
+    </div>
+
+    <div class="company-link">
+      <a href="https://www.cloudcounselage.com/" target="_blank">
+        © <span id="yearRange"></span> Cloud Counselage Pvt. Ltd.
+      </a>
+    </div>
+
+  </div>
+
+  <!-- Modal shown when appointment already generated -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h3 id="modalTitle">Appointment Letter Already Generated</h3>
+      <p id="modalMessage">The letter is already generated with the information shared in the past. Please proceed to downloading the same.</p>
+      <div class="actions">
+        <button class="btn ghost" id="modalClose">Close</button>
+        <button class="btn primary" id="modalDownload">Download Appointment Letter</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ====== Client script for IAC Portal ====== */
+
+/* Element refs */
+const emailInput = document.getElementById('email');
+const mobileInput = document.getElementById('mobile');
+const msgBox = document.getElementById('message');
+const loginBox = document.getElementById('loginBox');
+const dashboard = document.getElementById('dashboard');
+const loginNote = document.getElementById('loginNote');
+const welcomeText = document.getElementById('welcomeText');
+const appointmentBtn = document.getElementById('appointmentBtn');
+const experienceBtn = document.getElementById('experienceBtn');
+const postLoginNote = document.getElementById('postLoginNote');
+
+/* Modal elements */
+const modalBackdrop = document.getElementById('modalBackdrop');
+const modalDownload = document.getElementById('modalDownload');
+const modalClose = document.getElementById('modalClose');
+const modalMessage = document.getElementById('modalMessage');
+
+/* State */
+let _loginResp = null;
+
+/* Helper: show message in top area */
+function showMessage(text, bg) {
+  msgBox.style.display = 'block';
+  msgBox.style.background = bg || '#eef';
+  msgBox.innerText = text || '';
+}
+
+/* Login function — authenticates and stores server response but DOES NOT auto-open modal */
+function login() {
+  const email = (emailInput.value || '').trim();
+  const mobile = (mobileInput.value || '').trim();
+
+  if (!email || !mobile) {
+    showMessage('Please enter Email and Mobile Number.', '#ffe6e6');
+    return;
+  }
+
+  showMessage('Verifying credentials...', '#eef');
+
+  // call server
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (res && res.ok) {
+        _loginResp = res;
+
+        // show dashboard
+        loginBox.style.display = 'none';
+        dashboard.style.display = 'block';
+        loginNote.style.display = 'none';
+        welcomeText.innerText = 'Welcome, ' + (res.name || res.email || 'Learner');
+
+        // Always enable both buttons (we perform a fresh check on appointment button click)
+        appointmentBtn.disabled = false;
+        experienceBtn.disabled = false;
+
+        // hide any top messages
+        msgBox.style.display = 'none';
+      } else {
+        showMessage(res && res.message ? res.message : 'Invalid credentials.', '#ffe6e6');
+      }
+    })
+    .withFailureHandler(function(err) {
+      showMessage('Something went wrong. Please try again.', '#ffe6e6');
+      console.error('validateLogin error:', err);
+    })
+    .validateLogin(email, mobile);
+}
+
+/* Appointment button handler — RULE APPLIES HERE (on click only)
+   We do an on-click server check to ensure latest appointment status before allowing access.
+*/
+function openAppointmentApp() {
+  if (!_loginResp || !_loginResp.email) {
+    alert('Please sign in first.');
+    return;
+  }
+  const originalText = appointmentBtn.textContent;
+
+
+  appointmentBtn.disabled = true;
+  appointmentBtn.textContent = 'Checking...';
+  
+
+  google.script.run
+    .withSuccessHandler(function(res) {
+      appointmentBtn.disabled = false;
+      appointmentBtn.textContent = originalText;
+      
+
+      if (!res || !res.ok) {
+        alert(res && res.message ? res.message : 'Unable to verify appointment status.');
+        return;
+      }
+
+      // ✅ Case 1: Allow generator
+      if (res.appointmentAllowed === true && res.appointmentApp) {
+        window.open(res.appointmentApp + "?email=" + encodeURIComponent(_loginResp.email),"_blank");
+  
+        return;
+      }
+
+      // ✅ Case 2: Already generated → show modal
+      if (res.appointmentAllowed === false) {
+        modalMessage.innerText =
+          "The letter is already generated with the information shared in the past. Please proceed to downloading the same.";
+
+        modalDownload.style.display = '';
+        modalDownload.onclick = function () {
+          window.open(res.appointmentUrl, '_blank');
+        };
+
+        modalBackdrop.style.display = 'flex';
+        return;
+      }
+
+      alert('Appointment access not available.');
+    })
+    .withFailureHandler(function(err) {
+      appointmentBtn.disabled = false;
+      appointmentBtn.textContent = originalText;
+      alert('Server error while checking appointment status.');
+      console.error(err);
+    })
+    .checkAppointmentStatus(_loginResp.email);
+}
+
+
+
+/* Experience letter button (no special restriction) */
+function openExperienceApp() {
+  if (_loginResp && _loginResp.experienceApp) {
+    window.open(_loginResp.experienceApp, '_blank');
+  } else {
+    // fallback URL if backend didn't return
+    window.open('https://script.google.com/macros/s/AKfycbxVJZFG9JM249lesHjN3XB-tSsqRVXAQKu9OmUqZsjK1RqrFg46Ii5SIcraXXH9N0av/exec', '_blank');
+  }
+}
+
+/* Modal close handlers */
+modalClose.addEventListener('click', function() {
+  modalBackdrop.style.display = 'none';
+});
+modalBackdrop.addEventListener('click', function(e) {
+  if (e.target === modalBackdrop) modalBackdrop.style.display = 'none';
+});
+
+/* Expose functions to inline onclick (if your buttons call them inline) */
+window.login = login;
+window.openAppointmentApp = openAppointmentApp;
+window.openExperienceApp = openExperienceApp;
+window.closeModal = function(){ modalBackdrop.style.display = 'none'; };
+
+</script>
+<script>
+  const startYear = new Date().getFullYear();
+  const endYear = startYear + 1;
+  document.getElementById("yearRange").innerText =
+    startYear + "-" + endYear;
+</script>
+
+</body>
+</html>
+
+
+
+</body>
+</html>
